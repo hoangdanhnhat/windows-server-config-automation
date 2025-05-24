@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Windows Server Configuration Automation Tool
+Windows Server Configuration Automation Tool - Main Framework
 Checks Windows Server member & domain configuration against security standards
 """
 
@@ -12,6 +12,8 @@ from datetime import datetime
 from typing import Dict, List, Tuple, Any
 from dataclasses import dataclass, asdict
 from enum import Enum
+import importlib.util
+import sys
 
 
 class CheckStatus(Enum):
@@ -31,12 +33,26 @@ class CheckResult:
     category: str = ""
 
 
+@dataclass
+class CheckDefinition:
+    """Defines a configuration check to be performed"""
+    check_id: str
+    description: str
+    category: str
+    check_type: str  # 'privilege_not_assigned', 'privilege_restricted', 'custom'
+    parameters: Dict[str, Any]
+    recommendation: str = ""
+
+
 class WindowsConfigChecker:
     """Main class for Windows server configuration checking"""
     
-    def __init__(self):
+    def __init__(self, checks_module_path: str = "windows_checks.py"):
         self.results: List[CheckResult] = []
         self.temp_files: List[str] = []
+        self.checks_module_path = checks_module_path
+        self.check_definitions: List[CheckDefinition] = []
+        self.custom_scripts: Dict[str, str] = {}
         
     def __enter__(self):
         return self
@@ -54,10 +70,63 @@ class WindowsConfigChecker:
             except Exception as e:
                 print(f"Warning: Could not remove temp file {temp_file}: {e}")
     
+    def load_checks(self):
+        """Load check definitions and custom scripts from external module"""
+        try:
+            if not os.path.exists(self.checks_module_path):
+                print(f"Warning: Checks module '{self.checks_module_path}' not found. Using default checks.")
+                self._load_default_checks()
+                return
+            
+            # Load the checks module dynamically
+            spec = importlib.util.spec_from_file_location("windows_checks", self.checks_module_path)
+            checks_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(checks_module)
+            
+            # Load check definitions
+            if hasattr(checks_module, 'CHECK_DEFINITIONS'):
+                self.check_definitions = checks_module.CHECK_DEFINITIONS
+            else:
+                print("Warning: CHECK_DEFINITIONS not found in checks module. Using default checks.")
+                self._load_default_checks()
+            
+            # Load custom scripts
+            if hasattr(checks_module, 'CUSTOM_SCRIPTS'):
+                self.custom_scripts = checks_module.CUSTOM_SCRIPTS
+            
+            print(f"Loaded {len(self.check_definitions)} check definitions from {self.checks_module_path}")
+            
+        except Exception as e:
+            print(f"Error loading checks module: {e}")
+            print("Using default checks.")
+            self._load_default_checks()
+    
+    def _load_default_checks(self):
+        """Load default check definitions if external module is not available"""
+        self.check_definitions = [
+            CheckDefinition(
+                check_id="SEC-001",
+                description="Act as part of the operating system privilege should not be assigned",
+                category="Security Policy",
+                check_type="privilege_not_assigned",
+                parameters={"privilege": "SeTcbPrivilege"},
+                recommendation="Remove the 'SeTcbPrivilege' privilege from all accounts"
+            ),
+            CheckDefinition(
+                check_id="SEC-002", 
+                description="Adjust memory quotas for a process privilege should be restricted",
+                category="Security Policy",
+                check_type="privilege_restricted",
+                parameters={
+                    "privilege": "SeIncreaseQuotaPrivilege",
+                    "valid_accounts": ["Administrators", "LOCAL SERVICE", "NETWORK SERVICE"]
+                },
+                recommendation="Ensure only Administrators, LOCAL SERVICE, and NETWORK SERVICE have this privilege"
+            )
+        ]
+    
     def run_powershell_script(self, script: str) -> Tuple[str, str, int]:
-        """
-        Execute PowerShell script and return output, error, and return code
-        """
+        """Execute PowerShell script and return output, error, and return code"""
         try:
             # Create temporary script file
             with tempfile.NamedTemporaryFile(mode='w', suffix='.ps1', delete=False, encoding='utf-8') as f:
@@ -88,11 +157,10 @@ class WindowsConfigChecker:
         except Exception as e:
             return "", str(e), 1
     
-    def check_privilege_not_assigned(self, privilege: str, check_id: str, description: str) -> CheckResult:
-        """
-        Check that a specific privilege is not assigned to any account
-        Based on your first script
-        """
+    def check_privilege_not_assigned(self, check_def: CheckDefinition) -> CheckResult:
+        """Check that a specific privilege is not assigned to any account"""
+        privilege = check_def.parameters.get("privilege", "")
+        
         script = f'''
         try {{
             $privilege = "{privilege}"
@@ -113,62 +181,14 @@ class WindowsConfigChecker:
         }}
         '''
         
-        output, error, return_code = self.run_powershell_script(script)
-        
-        if return_code != 0 or error:
-            return CheckResult(
-                check_id=check_id,
-                description=description,
-                status=CheckStatus.ERROR,
-                details=f"Script execution failed: {error}",
-                category="Security Policy"
-            )
-        
-        lines = output.split('\n')
-        if not lines:
-            return CheckResult(
-                check_id=check_id,
-                description=description,
-                status=CheckStatus.ERROR,
-                details="No output from script",
-                category="Security Policy"
-            )
-        
-        status_line = lines[0].strip()
-        
-        if status_line == "PASS":
-            return CheckResult(
-                check_id=check_id,
-                description=description,
-                status=CheckStatus.PASS,
-                category="Security Policy"
-            )
-        elif status_line == "FAIL":
-            details = lines[1] if len(lines) > 1 else "Privilege is assigned"
-            return CheckResult(
-                check_id=check_id,
-                description=description,
-                status=CheckStatus.FAIL,
-                details=f"Accounts found with privilege '{privilege}': {details}",
-                recommendation=f"Remove the '{privilege}' privilege from all accounts",
-                category="Security Policy"
-            )
-        else:
-            return CheckResult(
-                check_id=check_id,
-                description=description,
-                status=CheckStatus.ERROR,
-                details=f"Unexpected output: {output}",
-                category="Security Policy"
-            )
+        return self._process_script_result(script, check_def, privilege)
     
-    def check_privilege_restricted_accounts(self, privilege: str, valid_accounts: List[str], 
-                                          check_id: str, description: str) -> CheckResult:
-        """
-        Check that a privilege is only assigned to specific valid accounts
-        Based on your second script
-        """
+    def check_privilege_restricted(self, check_def: CheckDefinition) -> CheckResult:
+        """Check that a privilege is only assigned to specific valid accounts"""
+        privilege = check_def.parameters.get("privilege", "")
+        valid_accounts = check_def.parameters.get("valid_accounts", [])
         valid_accounts_str = "', '".join(valid_accounts)
+        
         script = f'''
         try {{
             $privilege = "{privilege}"
@@ -198,54 +218,102 @@ class WindowsConfigChecker:
         }}
         '''
         
+        return self._process_script_result(script, check_def, privilege)
+    
+    def check_custom_script(self, check_def: CheckDefinition) -> CheckResult:
+        """Execute a custom PowerShell script"""
+        script_name = check_def.parameters.get("script_name", "")
+        
+        if script_name not in self.custom_scripts:
+            return CheckResult(
+                check_id=check_def.check_id,
+                description=check_def.description,
+                status=CheckStatus.ERROR,
+                details=f"Custom script '{script_name}' not found",
+                category=check_def.category
+            )
+        
+        script = self.custom_scripts[script_name]
+        return self._process_script_result(script, check_def)
+    
+    def _process_script_result(self, script: str, check_def: CheckDefinition, context: str = "") -> CheckResult:
+        """Process the result of a PowerShell script execution"""
         output, error, return_code = self.run_powershell_script(script)
         
         if return_code != 0 or error:
             return CheckResult(
-                check_id=check_id,
-                description=description,
+                check_id=check_def.check_id,
+                description=check_def.description,
                 status=CheckStatus.ERROR,
                 details=f"Script execution failed: {error}",
-                category="Security Policy"
+                category=check_def.category
             )
         
         lines = output.split('\n')
         if not lines:
             return CheckResult(
-                check_id=check_id,
-                description=description,
+                check_id=check_def.check_id,
+                description=check_def.description,
                 status=CheckStatus.ERROR,
                 details="No output from script",
-                category="Security Policy"
+                category=check_def.category
             )
         
         status_line = lines[0].strip()
         
         if status_line == "PASS":
             return CheckResult(
-                check_id=check_id,
-                description=description,
+                check_id=check_def.check_id,
+                description=check_def.description,
                 status=CheckStatus.PASS,
-                category="Security Policy"
+                category=check_def.category
             )
         elif status_line == "FAIL":
-            policy_line = lines[1] if len(lines) > 1 else ""
-            invalid_accounts = lines[2] if len(lines) > 2 else ""
+            details_lines = lines[1:] if len(lines) > 1 else ["Check failed"]
+            details = "\n".join(details_lines)
             return CheckResult(
-                check_id=check_id,
-                description=description,
+                check_id=check_def.check_id,
+                description=check_def.description,
                 status=CheckStatus.FAIL,
-                details=f"Policy: {policy_line}\n{invalid_accounts}",
-                recommendation=f"Ensure only these accounts have '{privilege}' privilege: {', '.join(valid_accounts)}",
-                category="Security Policy"
+                details=details,
+                recommendation=check_def.recommendation,
+                category=check_def.category
             )
         else:
             return CheckResult(
-                check_id=check_id,
-                description=description,
+                check_id=check_def.check_id,
+                description=check_def.description,
                 status=CheckStatus.ERROR,
                 details=f"Unexpected output: {output}",
-                category="Security Policy"
+                category=check_def.category
+            )
+    
+    def run_single_check(self, check_def: CheckDefinition) -> CheckResult:
+        """Execute a single check based on its definition"""
+        print(f"Running check [{check_def.check_id}]: {check_def.description}")
+        
+        try:
+            if check_def.check_type == "privilege_not_assigned":
+                return self.check_privilege_not_assigned(check_def)
+            elif check_def.check_type == "privilege_restricted":
+                return self.check_privilege_restricted(check_def)
+            elif check_def.check_type == "custom":
+                return self.check_custom_script(check_def)
+            else:
+                return CheckResult(
+                    check_id=check_def.check_id,
+                    description=check_def.description,
+                    status=CheckStatus.ERROR,
+                    details=f"Unknown check type: {check_def.check_type}",
+                    category=check_def.category
+                )
+        except Exception as e:
+            return CheckResult(
+                check_id=check_def.check_id,
+                description=check_def.description,
+                status=CheckStatus.ERROR,
+                details=f"Exception during check execution: {str(e)}",
+                category=check_def.category
             )
     
     def run_all_checks(self):
@@ -253,32 +321,16 @@ class WindowsConfigChecker:
         print("Starting Windows Server Configuration Check...")
         print("=" * 60)
         
-        # Check 1: SeTcbPrivilege should not be assigned
-        result1 = self.check_privilege_not_assigned(
-            privilege="SeTcbPrivilege",
-            check_id="SEC-001",
-            description="Act as part of the operating system privilege should not be assigned"
-        )
-        self.results.append(result1)
+        self.load_checks()
         
-        # Check 2: SeIncreaseQuotaPrivilege should only be assigned to specific accounts
-        result2 = self.check_privilege_restricted_accounts(
-            privilege="SeIncreaseQuotaPrivilege",
-            valid_accounts=["Administrators", "LOCAL SERVICE", "NETWORK SERVICE"],
-            check_id="SEC-002",
-            description="Adjust memory quotas for a process privilege should be restricted"
-        )
-        self.results.append(result2)
-        
-        # Add more checks here as needed
-        # Example of how to add more checks:
-        # result3 = self.check_privilege_not_assigned(
-        #     privilege="SeDebugPrivilege",
-        #     check_id="SEC-003",
-        #     description="Debug programs privilege should not be assigned"
-        # )
-        # self.results.append(result3)
-        
+        for check_def in self.check_definitions:
+            result = self.run_single_check(check_def)
+            self.results.append(result)
+            
+            # Print immediate status
+            status_symbol = "✓" if result.status == CheckStatus.PASS else "✗" if result.status == CheckStatus.FAIL else "!"
+            print(f"  {status_symbol} [{result.check_id}] {result.status.value}")
+    
     def generate_summary(self) -> Dict[str, Any]:
         """Generate summary statistics"""
         total_checks = len(self.results)
