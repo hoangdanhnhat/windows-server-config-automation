@@ -242,7 +242,7 @@ class WindowsConfigChecker:
                     Write-Output "Valid accounts found: $($friendlyNames -join ', ')"
                 }} else {{
                     Write-Output "FAIL"
-                    Write-Output "Policy line: $line"
+                    Write-Output $line
                     Write-Output "Friendly names: $($friendlyNames -join ', ')"
                     Write-Output "Invalid accounts: $($invalidAccounts -join ', ')"
                 }}
@@ -431,10 +431,18 @@ class WindowsConfigChecker:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"windows_config_check_{timestamp}.json"
         
+        # Convert results to JSON-serializable format
+        json_results = []
+        for result in self.results:
+            result_dict = asdict(result)
+            # Convert enum to string
+            result_dict['status'] = result.status.value
+            json_results.append(result_dict)
+        
         export_data = {
             "timestamp": datetime.now().isoformat(),
             "summary": self.generate_summary(),
-            "results": [asdict(result) for result in self.results]
+            "results": json_results
         }
         
         with open(filename, 'w', encoding='utf-8') as f:
@@ -442,7 +450,6 @@ class WindowsConfigChecker:
         
         print(f"\nResults exported to: {filename}")
         return filename
-
 
 def main():
     """Main execution function"""
