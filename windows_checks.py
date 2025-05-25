@@ -144,13 +144,56 @@ CHECK_DEFINITIONS = [
     ),
 
     CheckDefinition(
-        check_id="2.2.20",
-        description="Deny log on as batch job should be assigned to Guest",
+        check_id="2.2.23",
+        description="Deny log on as batch job should be include Guests",
         category="User Rights Test",
         check_type="privilege_denied",
         parameters={
             "privilege":"SeDenyBatchLogonRight",
-            "valid_accounts": ["Guest"]
+            "valid_accounts": ["Guests"]
+        }  
+    ),
+
+    CheckDefinition(
+        check_id="2.2.24",
+        description="Deny log on as a service should include Guests",
+        category="User Rights Test",
+        check_type="privilege_denied",
+        parameters={
+            "privilege":"SeDenyServiceLogonRight",
+            "valid_accounts": ["Guests"]
+        }  
+    ),
+
+    CheckDefinition(
+        check_id="2.2.29",
+        description="Enable computer and user accounts to be trusted for delegation should not be assigned",
+        category="User Rights Test",
+        check_type="privilege_not_assigned",
+        parameters={
+            "privilege":"SeEnableDelegationPrivilege",
+        }  
+    ),
+
+    CheckDefinition(
+        check_id="2.2.30",
+        description="Force shutdown from a remote system should be restricted",
+        category="User Rights Test",
+        check_type="privilege_restricted",
+        parameters={
+            "privilege":"SeRemoteShutdownPrivilege",
+            "valid_accounts": ["Administrators"]
+        }  
+    ),
+
+    CheckDefinition(
+        check_id="2.2.31",
+        description="Generate security audits should be restricted",
+        category="User Rights Test",
+        check_type="privilege_restricted",
+        parameters={
+            "privilege":"SeAuditPrivilege",
+            "valid_accounts": ["LOCAL SERVICE", "NETWORK SERVICE"]
         }  
     ),
 
