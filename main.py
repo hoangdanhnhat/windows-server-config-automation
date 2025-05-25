@@ -198,38 +198,57 @@ class WindowsConfigChecker:
             $line = $content | Where-Object {{ $_ -match "^$privilege\\s*=" }}
             
             if ($line) {{
-                $sids = $line -replace "^$privilege\\s*=\\s*", "" -split ',' | ForEach-Object {{ $_.Trim() }}
+                $accounts = $line -replace "^$privilege\\s*=\\s*", "" -split ',' | ForEach-Object {{ $_.Trim() }}
                 
-                # Convert SIDs to account names
-                $accounts = @()
-                foreach ($sid in $sids) {{
-                    try {{
-                        # Remove leading asterisk if present
-                        $cleanSid = $sid -replace "^\\*", ""
-                        
-                        # Convert SID to account name
-                        $objSID = New-Object System.Security.Principal.SecurityIdentifier($cleanSid)
-                        $objUser = $objSID.Translate([System.Security.Principal.NTAccount])
-                        $accounts += $objUser.Value
-                    }}
-                    catch {{
-                        # If SID conversion fails, keep the original SID
-                        $accounts += $sid
+                # Convert SIDs to friendly names for comparison
+                $friendlyNames = @()
+                foreach ($account in $accounts) {{
+                    if ($account.StartsWith("*S-")) {{
+                        try {{
+                            $sid = $account.Substring(1)  # Remove the * prefix
+                            $objSID = New-Object System.Security.Principal.SecurityIdentifier($sid)
+                            $friendlyName = $objSID.Translate([System.Security.Principal.NTAccount]).Value
+                            $friendlyNames += $friendlyName
+                        }} catch {{
+                            $friendlyNames += $account  # Keep original if translation fails
+                        }}
+                    }} else {{
+                        $friendlyNames += $account
                     }}
                 }}
                 
                 $validAccounts = @('{valid_accounts_str}')
-                $invalidAccounts = $accounts | Where-Object {{ $_ -notin $validAccounts }}
+                
+                # Check both friendly names and common variations
+                $validVariations = @()
+                foreach ($valid in $validAccounts) {{
+                    $validVariations += $valid
+                    if ($valid -eq "Administrators") {{
+                        $validVariations += "BUILTIN\\Administrators"
+                        $validVariations += $env:COMPUTERNAME + "\\Administrators"
+                    }}
+                    if ($valid -eq "LOCAL SERVICE") {{
+                        $validVariations += "NT AUTHORITY\\LOCAL SERVICE"
+                    }}
+                    if ($valid -eq "NETWORK SERVICE") {{
+                        $validVariations += "NT AUTHORITY\\NETWORK SERVICE"
+                    }}
+                }}
+                
+                $invalidAccounts = $friendlyNames | Where-Object {{ $_ -notin $validVariations }}
                 
                 if ($invalidAccounts.Count -eq 0) {{
                     Write-Output "PASS"
+                    Write-Output "Valid accounts found: $($friendlyNames -join ', ')"
                 }} else {{
                     Write-Output "FAIL"
-                    Write-Output $line
-                    Write-Output ("Invalid accounts: " + ($invalidAccounts -join ', '))
+                    Write-Output "Policy line: $line"
+                    Write-Output "Friendly names: $($friendlyNames -join ', ')"
+                    Write-Output "Invalid accounts: $($invalidAccounts -join ', ')"
                 }}
             }} else {{
                 Write-Output "PASS"
+                Write-Output "Privilege not assigned to any accounts"
             }}
         }} catch {{
             Write-Output "ERROR"
