@@ -197,6 +197,70 @@ CHECK_DEFINITIONS = [
         }  
     ),
 
+    CheckDefinition(
+        check_id="2.2.33",
+        description="SeImpersonatePrivilege should be restricted",
+        category="User Rights Test",
+        check_type="privilege_restricted",
+        parameters={
+            "privilege": "SeImpersonatePrivilege",
+            "valid_accounts": ["Administrators", "LOCAL SERVICE", "NETWORK SERVICE", "SERVICE", "IIS_IUSRS"]
+        }
+    ),
+
+    CheckDefinition(
+        check_id="2.2.34",
+        description="Increase scheduling priority should be restricted",
+        category="User Rights Test",
+        check_type="privilege_restricted",
+        parameters={
+            "privilege": "SeIncreaseBasePriorityPrivilege",
+            "valid_accounts": ["Administrators", "Window Manager\Window Manager Group"]
+        }
+    ),
+
+    CheckDefinition(
+        check_id="2.2.35",
+        description="Load and unload device driver should be restricted",
+        category="User Rights Test",
+        check_type="privilege_restricted",
+        parameters={
+            "privilege": "SeLoadDriverPrivilege",
+            "valid_accounts": ["Administrators"]
+        }
+    ),
+
+    CheckDefinition(
+        check_id="2.2.36",
+        description="Lock pages in memory should not be assigned",
+        category="User Rights Test",
+        check_type="privilege_not_assigned",
+        parameters={
+            "privilege": "SeLockMemoryPrivilege",
+        }
+    ),
+
+    CheckDefinition(
+        check_id="2.2.39",
+        description="Manage auditing and security log should be restricted (Member Server only)",
+        category="User Rights Test",
+        check_type="privilege_restricted",
+        parameters={
+            "privilege": "SeLockMemoryPrivilege",
+            "valid_accounts": ["Administrators"]
+        }
+    ),
+
+    CheckDefinition(
+        check_id="2.2.40",
+        description="Modify an object should not be assigned",
+        category="User Rights Test",
+        check_type="privilege_not_assigned",
+        parameters={
+            "privilege": "SeRelabelPrivilege",
+        }
+    ),
+
 ]
 
 
