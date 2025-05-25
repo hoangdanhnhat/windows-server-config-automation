@@ -45,6 +45,15 @@ CHECK_DEFINITIONS = [
         },
         recommendation="Ensure only Administrators, LOCAL SERVICE, and NETWORK SERVICE have this privilege"
     ),
+
+    CheckDefinition(
+        check_id="2.2.11",
+        description="SeBackupPrivilege should be restricted",
+        category="User Rights Test",
+        check_type="privilege_restricted",
+        parameters={"privilege":"SeBackupPrivilege"},
+        recommendation="Ensure SeBackupPrivilege is set to Administrators"
+    )
     
     # CheckDefinition(
     #     check_id="SEC-003",
