@@ -99,8 +99,61 @@ CHECK_DEFINITIONS = [
         parameters={
             "privilege":"SeCreateTokenPrivilege",
         }
-    )
-    
+    ),
+
+    CheckDefinition(
+        check_id="2.2.1",
+        description="Access Credential as a trusted caller should not be assigned",
+        category="User Rights Test",
+        check_type="privilege_not_assigned",
+        parameters={
+            "privilege":"SeTrustedCredManAccessPrivilege",
+        }  
+    ),
+
+    CheckDefinition(
+        check_id="2.2.16",
+        description="Create global object should be restricted",
+        category="User Rights Test",
+        check_type="privilege_restricted",
+        parameters={
+            "privilege":"SeCreateGlobalPrivilege",
+            "valid_accounts":["Administrators", "LOCAL SERVICE", "NETWORK SERVICE", "SERVICE"]
+        }  
+    ),
+
+    CheckDefinition(
+        check_id="2.2.17",
+        description="Create permanent shared object should not be assigned",
+        category="User Rights Test",
+        check_type="privilege_not_assigned",
+        parameters={
+            "privilege":"SeCreatePermanentPrivilege",
+        }  
+    ),
+
+    CheckDefinition(
+        check_id="2.2.19",
+        description="Create symbolic links should be restricted",
+        category="User Rights Test",
+        check_type="privilege_restricted",
+        parameters={
+            "privilege":"SeCreateSymbolicLinkPrivilege",
+            "valid_accounts": ["Administrators", "NT VIRTUAL MACHINE\Virtual machines"]
+        }  
+    ),
+
+    CheckDefinition(
+        check_id="2.2.20",
+        description="Deny log on as batch job should be assigned to Guest",
+        category="User Rights Test",
+        check_type="privilege_denied",
+        parameters={
+            "privilege":"SeDenyBatchLogonRight",
+            "valid_accounts": ["Guest"]
+        }  
+    ),
+
 ]
 
 

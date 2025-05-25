@@ -258,6 +258,63 @@ class WindowsConfigChecker:
         
         return self._process_script_result(script, check_def, privilege)
     
+    def check_privilege_denied(self, check_def: CheckDefinition) -> CheckResult:
+        """Check that a privilege is denied to a specific accounts"""
+        privilege = check_def.parameters.get("privilege", "")
+        valid_accounts = check_def.parameters.get("valid_accounts", [])
+        valid_accounts_str = "', '".join(valid_accounts)
+
+        script = f'''
+            try{{
+            $privilege = "{privilege}"
+            secedit /export /cfg C:\\secpol.cfg | Out-Null
+            $content = Get-Content C:\\secpol.cfg -ErrorAction Stop
+            
+            $line = $content | Where-Object {{ $_ -match "^$privilege\\s*=" }}
+
+            if ($line) {{
+                $sids = $line -replace "^$privilege\\s*=\\s*", "" -split ',' | ForEach-Object {{ $_.Trim() }}
+                
+                # Convert SIDs to account names
+                $accounts = @()
+                foreach ($sid in $sids) {{
+                    try {{
+                        # Remove leading asterisk if present
+                        $cleanSid = $sid -replace "^\\*", ""
+                        
+                        # Convert SID to account name
+                        $objSID = New-Object System.Security.Principal.SecurityIdentifier($cleanSid)
+                        $objUser = $objSID.Translate([System.Security.Principal.NTAccount])
+                        $accounts += $objUser.Value
+                    }}
+                    catch {{
+                        # If SID conversion fails, keep the original SID
+                        $accounts += $sid
+                    }}
+                }}
+                
+                # Check if the valid account is present
+                $validAccount = @("{valid_accounts_str}")
+                if ($validAccount -in $accounts) {{
+                    Write-Output "PASS"
+                }} else {{
+                    Write-Output "FAIL"
+                    Write-Output $line
+                    Write-Output ("Valid account '$validAccount' not found. Current accounts: " + ($accounts -join ', '))
+                }}
+            }} else {{
+                # No privilege assignment found - this could be PASS or FAIL depending on requirements
+                Write-Output "FAIL"
+                Write-Output "Privilege $privilege not found in security policy"
+            }}
+        }} catch {{
+            Write-Output "ERROR"
+            Write-Output $_.Exception.Message
+        }}
+        '''
+
+        return self._process_script_result(script, check_def, privilege)
+    
     def check_custom_script(self, check_def: CheckDefinition) -> CheckResult:
         """Execute a custom PowerShell script"""
         script_name = check_def.parameters.get("script_name", "")
@@ -335,6 +392,8 @@ class WindowsConfigChecker:
                 return self.check_privilege_not_assigned(check_def)
             elif check_def.check_type == "privilege_restricted":
                 return self.check_privilege_restricted(check_def)
+            elif check_def.check_type == "privilege_denied":
+                return self.check_privilege_denied(check_def)
             elif check_def.check_type == "custom":
                 return self.check_custom_script(check_def)
             else:
