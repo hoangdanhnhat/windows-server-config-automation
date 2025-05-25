@@ -26,18 +26,18 @@ class CheckDefinition:
 CHECK_DEFINITIONS = [
     # Security Policy Checks
     CheckDefinition(
-        check_id="SEC-001",
+        check_id="2.2.4",
         description="Act as part of the operating system privilege should not be assigned",
-        category="Security Policy",
+        category="User Rights Test",
         check_type="privilege_not_assigned",
         parameters={"privilege": "SeTcbPrivilege"},
         recommendation="Remove the 'SeTcbPrivilege' privilege from all accounts"
     ),
     
     CheckDefinition(
-        check_id="SEC-002", 
+        check_id="2.2.6", 
         description="Adjust memory quotas for a process privilege should be restricted",
-        category="Security Policy",
+        category="User Rights Test",
         check_type="privilege_restricted",
         parameters={
             "privilege": "SeIncreaseQuotaPrivilege",
