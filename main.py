@@ -198,7 +198,26 @@ class WindowsConfigChecker:
             $line = $content | Where-Object {{ $_ -match "^$privilege\\s*=" }}
             
             if ($line) {{
-                $accounts = $line -replace "^$privilege\\s*=\\s*", "" -split ',' | ForEach-Object {{ $_.Trim() }}
+                $sids = $line -replace "^$privilege\\s*=\\s*", "" -split ',' | ForEach-Object {{ $_.Trim() }}
+                
+                # Convert SIDs to account names
+                $accounts = @()
+                foreach ($sid in $sids) {{
+                    try {{
+                        # Remove leading asterisk if present
+                        $cleanSid = $sid -replace "^\\*", ""
+                        
+                        # Convert SID to account name
+                        $objSID = New-Object System.Security.Principal.SecurityIdentifier($cleanSid)
+                        $objUser = $objSID.Translate([System.Security.Principal.NTAccount])
+                        $accounts += $objUser.Value
+                    }}
+                    catch {{
+                        # If SID conversion fails, keep the original SID
+                        $accounts += $sid
+                    }}
+                }}
+                
                 $validAccounts = @('{valid_accounts_str}')
                 $invalidAccounts = $accounts | Where-Object {{ $_ -notin $validAccounts }}
                 
