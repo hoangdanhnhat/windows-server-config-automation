@@ -490,6 +490,13 @@ class WindowsConfigChecker:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"windows_config_check_{timestamp}.json"
         
+        # Create reports directory if it doesn't exist
+        reports_dir = "reports"
+        os.makedirs(reports_dir, exist_ok=True)
+        
+        # Construct full file path
+        filepath = os.path.join(reports_dir, filename)
+        
         # Convert results to JSON-serializable format
         json_results = []
         for result in self.results:
@@ -504,11 +511,11 @@ class WindowsConfigChecker:
             "results": json_results
         }
         
-        with open(filename, 'w', encoding='utf-8') as f:
+        with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(export_data, f, indent=2, ensure_ascii=False)
         
-        print(f"\nResults exported to: {filename}")
-        return filename
+        print(f"\nResults exported to: {filepath}")
+        return filepath
 
 def main():
     """Main execution function"""
