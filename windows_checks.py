@@ -46,83 +46,83 @@ CHECK_DEFINITIONS = [
         recommendation="Ensure only Administrators, LOCAL SERVICE, and NETWORK SERVICE have this privilege"
     ),
     
-    CheckDefinition(
-        check_id="SEC-003",
-        description="Debug programs privilege should not be assigned",
-        category="Security Policy",
-        check_type="privilege_not_assigned",
-        parameters={"privilege": "SeDebugPrivilege"},
-        recommendation="Remove the 'SeDebugPrivilege' privilege from all accounts except Administrators if absolutely necessary"
-    ),
+    # CheckDefinition(
+    #     check_id="SEC-003",
+    #     description="Debug programs privilege should not be assigned",
+    #     category="Security Policy",
+    #     check_type="privilege_not_assigned",
+    #     parameters={"privilege": "SeDebugPrivilege"},
+    #     recommendation="Remove the 'SeDebugPrivilege' privilege from all accounts except Administrators if absolutely necessary"
+    # ),
     
-    CheckDefinition(
-        check_id="SEC-004",
-        description="Log on as a service privilege should be restricted",
-        category="Security Policy", 
-        check_type="privilege_restricted",
-        parameters={
-            "privilege": "SeServiceLogonRight",
-            "valid_accounts": ["LOCAL SERVICE", "NETWORK SERVICE"]
-        },
-        recommendation="Ensure only service accounts have the 'Log on as a service' privilege"
-    ),
+    # CheckDefinition(
+    #     check_id="SEC-004",
+    #     description="Log on as a service privilege should be restricted",
+    #     category="Security Policy", 
+    #     check_type="privilege_restricted",
+    #     parameters={
+    #         "privilege": "SeServiceLogonRight",
+    #         "valid_accounts": ["LOCAL SERVICE", "NETWORK SERVICE"]
+    #     },
+    #     recommendation="Ensure only service accounts have the 'Log on as a service' privilege"
+    # ),
     
-    CheckDefinition(
-        check_id="SEC-005",
-        description="Backup files and directories privilege should be restricted",
-        category="Security Policy",
-        check_type="privilege_restricted", 
-        parameters={
-            "privilege": "SeBackupPrivilege",
-            "valid_accounts": ["Administrators", "Backup Operators"]
-        },
-        recommendation="Ensure only Administrators and Backup Operators have backup privileges"
-    ),
+    # CheckDefinition(
+    #     check_id="SEC-005",
+    #     description="Backup files and directories privilege should be restricted",
+    #     category="Security Policy",
+    #     check_type="privilege_restricted", 
+    #     parameters={
+    #         "privilege": "SeBackupPrivilege",
+    #         "valid_accounts": ["Administrators", "Backup Operators"]
+    #     },
+    #     recommendation="Ensure only Administrators and Backup Operators have backup privileges"
+    # ),
     
-    CheckDefinition(
-        check_id="PWD-001",
-        description="Password policy - minimum password length should be adequate",
-        category="Password Policy",
-        check_type="custom",
-        parameters={"script_name": "check_password_length"},
-        recommendation="Set minimum password length to at least 8 characters"
-    ),
+    # CheckDefinition(
+    #     check_id="PWD-001",
+    #     description="Password policy - minimum password length should be adequate",
+    #     category="Password Policy",
+    #     check_type="custom",
+    #     parameters={"script_name": "check_password_length"},
+    #     recommendation="Set minimum password length to at least 8 characters"
+    # ),
     
-    CheckDefinition(
-        check_id="PWD-002", 
-        description="Password policy - maximum password age should be configured",
-        category="Password Policy",
-        check_type="custom",
-        parameters={"script_name": "check_password_age"},
-        recommendation="Set maximum password age to 90 days or less"
-    ),
+    # CheckDefinition(
+    #     check_id="PWD-002", 
+    #     description="Password policy - maximum password age should be configured",
+    #     category="Password Policy",
+    #     check_type="custom",
+    #     parameters={"script_name": "check_password_age"},
+    #     recommendation="Set maximum password age to 90 days or less"
+    # ),
     
-    CheckDefinition(
-        check_id="AUD-001",
-        description="Audit policy - logon events should be enabled",
-        category="Audit Policy",
-        check_type="custom",
-        parameters={"script_name": "check_audit_logon"},
-        recommendation="Enable auditing for successful and failed logon events"
-    ),
+    # CheckDefinition(
+    #     check_id="AUD-001",
+    #     description="Audit policy - logon events should be enabled",
+    #     category="Audit Policy",
+    #     check_type="custom",
+    #     parameters={"script_name": "check_audit_logon"},
+    #     recommendation="Enable auditing for successful and failed logon events"
+    # ),
     
-    CheckDefinition(
-        check_id="SVC-001",
-        description="Unnecessary services should be disabled",
-        category="Services",
-        check_type="custom",
-        parameters={"script_name": "check_unnecessary_services"},
-        recommendation="Disable services that are not required for server operation"
-    ),
+    # CheckDefinition(
+    #     check_id="SVC-001",
+    #     description="Unnecessary services should be disabled",
+    #     category="Services",
+    #     check_type="custom",
+    #     parameters={"script_name": "check_unnecessary_services"},
+    #     recommendation="Disable services that are not required for server operation"
+    # ),
     
-    CheckDefinition(
-        check_id="NET-001",
-        description="Network sharing configuration should be secure",
-        category="Network Security",
-        check_type="custom", 
-        parameters={"script_name": "check_network_shares"},
-        recommendation="Remove unnecessary network shares and secure required ones"
-    )
+    # CheckDefinition(
+    #     check_id="NET-001",
+    #     description="Network sharing configuration should be secure",
+    #     category="Network Security",
+    #     check_type="custom", 
+    #     parameters={"script_name": "check_network_shares"},
+    #     recommendation="Remove unnecessary network shares and secure required ones"
+    # )
 ]
 
 
