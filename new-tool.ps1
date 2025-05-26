@@ -1228,8 +1228,13 @@ function Show-Report {
 function Export-ToCSV {
     param(
         [AuditResults]$Results,
-        [string]$Path = "ServerAudit_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
+        [string]$Path = "Reports\ServerAudit_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
     )
+    
+    # Create Reports directory if it doesn't exist
+    if (-not (Test-Path "Reports")) {
+        New-Item -ItemType Directory -Path "Reports" | Out-Null
+    }
     
     $Results.Checks | Select-Object Name, CISID, Category, Description, Sensitivity, Status, Details | Export-Csv -Path $Path -NoTypeInformation
     Write-Host "Results exported to: $Path" -ForegroundColor Cyan
@@ -1274,6 +1279,8 @@ function Start-Audit {
     
     if ($ExportCSV) {
         if ($CSVPath) {
+            # If custom path provided, ensure it's in the Reports folder
+            $CSVPath = "Reports\$($CSVPath.TrimStart('\/'))"
             Export-ToCSV -Results $results -Path $CSVPath
         } else {
             Export-ToCSV -Results $results
