@@ -1203,7 +1203,7 @@ function Show-Report {
         
         foreach ($check in $failedChecks) {
             Write-Host ""
-            Write-Host "X $($check.Name)" -ForegroundColor Red
+            Write-Host "X $($check.Name) - Sensitivity: $($Sensitivity)" -ForegroundColor Red
             Write-Host "  Category: $($check.Category)" -ForegroundColor Gray
             Write-Host "  Description: $($check.Description)" -ForegroundColor Gray
             Write-Host "  Details: $($check.Details)" -ForegroundColor Yellow
@@ -1231,7 +1231,7 @@ function Export-ToCSV {
         [string]$Path = "ServerAudit_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
     )
     
-    $Results.Checks | Select-Object Name, Category, Description, Status, Details | Export-Csv -Path $Path -NoTypeInformation
+    $Results.Checks | Select-Object Name, Category, Description, Sensitivity, Status, Details | Export-Csv -Path $Path -NoTypeInformation
     Write-Host "Results exported to: $Path" -ForegroundColor Cyan
 }
 
