@@ -11,10 +11,11 @@ class ConfigCheck {
     [string]$Details
     [string]$Category
     
-    ConfigCheck([string]$CISID, [string]$name, [string]$desc, [string]$cat) {
+    ConfigCheck([string]$CISID, [string]$name, [string]$desc, [int16]$Sensitivity, [string]$cat) {
         $this.CISID = $CISID
         $this.Name = $name
         $this.Description = $desc
+        $this.Sensitivity = $Sensitivity
         $this.Category = $cat
         $this.Status = "NOT_CHECKED"
         $this.Details = ""
@@ -53,7 +54,7 @@ function Test-SeTcbPrivilege {
         "2.2.4",
         "SeTcbPrivilege", 
         "No accounts should have Act as part of OS privilege",
-        10, 
+        10,
         "Security Privileges"
         )
     
@@ -92,7 +93,7 @@ function Test-SeIncreaseQuotaPrivilege {
         "2.2.6",
         "SeIncreaseQuotaPrivilege", 
         "Only approved accounts should have Adjust memory quotas privilege",
-        7, 
+        7,
         "Security Privileges"
         )
     
@@ -141,6 +142,7 @@ function Test-SeBackupPrivilege {
         "2.2.11",
         "SeBackupPrivilege",
         "SeBackupPrivilege should be restricted",
+        8,
         "User Rights Test"
     )
     
@@ -189,6 +191,7 @@ function Test-SeSystemTimePrivilege {
         "2.2.12",
         "SeSystemTimePrivilege",
         "Change the system time should be restricted",
+        9,
         "User Rights Test"
     )
     
@@ -237,6 +240,7 @@ function Test-SeTimeZonePrivilege {
         "2.2.13",
         "SeTimeZonePrivilege",
         "Change the time zone privilege should be restricted",
+        1,
         "Security Privileges"
     )
     
@@ -292,6 +296,7 @@ function Test-SeCreatePagefilePrivilege {
         "2.2.14",
         "SeCreatePagefilePrivilege",
         "Create a pagefile privilege should be restricted",
+        6,
         "Security Privileges"
     )
     
@@ -344,6 +349,7 @@ function Test-SeCreateTokenPrivilege {
         "2.2.15",
         "SeCreateTokenPrivilege",
         "Create a token object privilege should not be assigned",
+        10,
         "Security Privileges"
     )
     
@@ -382,6 +388,7 @@ function Test-SeTrustedCredManAccessPrivilege {
         "2.2.1",
         "SeTrustedCredManAccessPrivilege",
         "Access Credential Manager as a trusted caller should not be assigned",
+        10,
         "Security Privileges"
     )
     
@@ -420,6 +427,7 @@ function Test-SeCreateGlobalPrivilege {
         "2.2.16",
         "SeCreateGlobalPrivilege",
         "Create global objects privilege should be restricted",
+        7,
         "Security Privileges"
     )
     
@@ -476,6 +484,7 @@ function Test-SeCreatePermanentPrivilege {
         "2.2.17",
         "SeCreatePermanentPrivilege",
         "Create permanent shared objects privilege should not be assigned",
+        6,
         "Security Privileges"
     )
     
@@ -514,6 +523,7 @@ function Test-SeCreateSymbolicLinkPrivilege {
         "2.2.19",
         "SeCreateSymbolicLinkPrivilege",
         "Create symbolic links privilege should be restricted",
+        10,
         "Security Privileges"
     )
     
@@ -559,6 +569,58 @@ function Test-SeCreateSymbolicLinkPrivilege {
     $Results.AddCheck($check)
 }
 
+fucntion Test-SeDebugPrivilege {
+    param([AuditResults]$Results)
+
+    $check = [ConfigCheck]::new(
+        "2.2.20",
+        "SeDebugPrivilege",
+        "Debug privilege should be restricted",
+        10,
+        "Security Privileges"
+    )
+
+    try {
+        $privilege = "SeDebugPrivilege"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "Administrators"
+            )
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "PASS"
+            $check.Details = "No accounts have $privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+
 function Test-SeDenyBatchLogonRight {
     param([AuditResults]$Results)
     
@@ -566,6 +628,7 @@ function Test-SeDenyBatchLogonRight {
         "2.2.23",
         "SeDenyBatchLogonRight",
         "Deny log on as batch job should include Guests",
+        5,
         "Security Privileges"
     )
     
@@ -616,6 +679,7 @@ function Test-SeDenyServiceLogonRight {
         "2.2.24",
         "SeDenyServiceLogonRight",
         "Deny log on as a service should include Guests",
+        5,
         "Security Privileges"
     )
     
@@ -666,6 +730,7 @@ function Test-SeEnableDelegationPrivilege {
         "2.2.29",
         "SeEnableDelegationPrivilege",
         "Enable computer and user accounts to be trusted for delegation should not be assigned",
+        9,
         "Security Privileges"
     )
     
@@ -704,6 +769,7 @@ function Test-SeRemoteShutdownPrivilege {
         "2.2.30",
         "SeRemoteShutdownPrivilege",
         "Force shutdown from a remote system should be restricted",
+        9,
         "Security Privileges"
     )
     
@@ -756,6 +822,7 @@ function Test-SeAuditPrivilege {
         "2.2.31",
         "SeAuditPrivilege",
         "Generate security audits should be restricted",
+        9,
         "Security Privileges"
     )
     
@@ -811,6 +878,7 @@ function Test-SeImpersonatePrivilege {
         "2.2.33",
         "SeImpersonatePrivilege",
         "Impersonate a client after authentication should be restricted",
+        10,
         "Security Privileges"
     )
     
@@ -870,6 +938,7 @@ function Test-SeIncreaseBasePriorityPrivilege {
         "2.2.34",
         "SeIncreaseBasePriorityPrivilege",
         "Increase scheduling priority should be restricted",
+        8,
         "Security Privileges"
     )
     
@@ -923,6 +992,7 @@ function Test-SeLoadDriverPrivilege {
         "2.2.35",
         "SeLoadDriverPrivilege",
         "Load and unload device drivers should be restricted",
+        10,
         "Security Privileges"
     )
     
@@ -975,6 +1045,7 @@ function Test-SeLockMemoryPrivilege {
         "2.2.36",
         "SeLockMemoryPrivilege",
         "Lock pages in memory should not be assigned",
+        9,
         "Security Privileges"
     )
     
@@ -1006,18 +1077,19 @@ function Test-SeLockMemoryPrivilege {
     $Results.AddCheck($check)
 }
 
-function Test-SeMachineAccountPrivilege {
+function Test-SeSecurityPrivilege {
     param([AuditResults]$Results)
     
     $check = [ConfigCheck]::new(
         "2.2.39",
-        "SeMachineAccountPrivilege",
+        "SeSecurityPrivilege",
         "Manage auditing and security log should be restricted (Member Server only)",
+        10,
         "Security Privileges"
     )
     
     try {
-        $privilege = "SeMachineAccountPrivilege"
+        $privilege = "SeSecurityPrivilege"
         secedit /export /cfg C:\secpol.cfg | Out-Null
         $content = Get-Content C:\secpol.cfg -ErrorAction Stop
         
@@ -1065,6 +1137,7 @@ function Test-SeRelabelPrivilege {
         "2.2.40",
         "SeRelabelPrivilege",
         "Modify an object label should not be assigned",
+        7,
         "Security Privileges"
     )
     
@@ -1193,7 +1266,7 @@ function Start-Audit {
     Test-SeIncreaseBasePriorityPrivilege -Results $results
     Test-SeLoadDriverPrivilege -Results $results
     Test-SeLockMemoryPrivilege -Results $results
-    Test-SeMachineAccountPrivilege -Results $results
+    Test-SeSecurityPrivilege -Results $results
     Test-SeRelabelPrivilege -Results $results
     
     Show-Report -Results $results
