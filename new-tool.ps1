@@ -5,7 +5,8 @@
 class ConfigCheck {
     [string]$CISID
     [string]$Name
-    [string]$Description  
+    [string]$Description
+    [int16]$Sensitivity  
     [string]$Status
     [string]$Details
     [string]$Category
@@ -50,8 +51,9 @@ function Test-SeTcbPrivilege {
     
     $check = [ConfigCheck]::new(
         "2.2.4",
-        "SeTcbPrivilege Check", 
-        "No accounts should have Act as part of OS privilege", 
+        "SeTcbPrivilege", 
+        "No accounts should have Act as part of OS privilege",
+        10, 
         "Security Privileges"
         )
     
@@ -88,8 +90,9 @@ function Test-SeIncreaseQuotaPrivilege {
     
     $check = [ConfigCheck]::new(
         "2.2.6",
-        "SeIncreaseQuotaPrivilege Check", 
-        "Only approved accounts should have Adjust memory quotas privilege", 
+        "SeIncreaseQuotaPrivilege", 
+        "Only approved accounts should have Adjust memory quotas privilege",
+        7, 
         "Security Privileges"
         )
     
