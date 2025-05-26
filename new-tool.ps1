@@ -569,7 +569,7 @@ function Test-SeCreateSymbolicLinkPrivilege {
     $Results.AddCheck($check)
 }
 
-fucntion Test-SeDebugPrivilege {
+function Test-SeDebugPrivilege {
     param([AuditResults]$Results)
 
     $check = [ConfigCheck]::new(
@@ -1257,6 +1257,7 @@ function Start-Audit {
     Test-SeCreateGlobalPrivilege -Results $results
     Test-SeCreatePermanentPrivilege -Results $results
     Test-SeCreateSymbolicLinkPrivilege -Results $results
+    Test-SeDebugPrivilege -Results $results
     Test-SeDenyBatchLogonRight -Results $results
     Test-SeDenyServiceLogonRight -Results $results
     Test-SeEnableDelegationPrivilege -Results $results
