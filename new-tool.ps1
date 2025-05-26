@@ -1,4 +1,5 @@
 # Windows Server Configuration Audit Tool
+# Clean Version - No Complex String Operations
 
 # Configuration Check Class
 class ConfigCheck {
@@ -125,17 +126,14 @@ function Show-Report {
     $Results.UpdateStats()
     
     Write-Host ""
-    $separator = "=" * 70
-    Write-Host $separator -ForegroundColor Green
+    Write-Host "============================================================" -ForegroundColor Green
     Write-Host "WINDOWS SERVER CONFIGURATION AUDIT REPORT" -ForegroundColor Green
-    Write-Host $separator -ForegroundColor Green
+    Write-Host "============================================================" -ForegroundColor Green
     Write-Host "Scan Date: $($Results.StartTime.ToString('yyyy-MM-dd HH:mm:ss'))" -ForegroundColor Cyan
     Write-Host ""
     
-    # Summary
     Write-Host "SUMMARY:" -ForegroundColor Yellow
-    $summSep = "-" * 40
-    Write-Host $summSep -ForegroundColor Yellow
+    Write-Host "----------------------------------------" -ForegroundColor Yellow
     Write-Host "Total Criteria Scanned: $($Results.Total)" -ForegroundColor White
     Write-Host "PASSED: $($Results.Passed)" -ForegroundColor Green
     Write-Host "FAILED: $($Results.Failed)" -ForegroundColor Red
@@ -148,12 +146,10 @@ function Show-Report {
     
     Write-Host ""
     
-    # Failed Details
     $failedChecks = $Results.Checks | Where-Object { $_.Status -eq "FAIL" }
     if ($failedChecks.Count -gt 0) {
         Write-Host "FAILED CRITERIA DETAILS:" -ForegroundColor Red
-        $failSep = "-" * 40
-        Write-Host $failSep -ForegroundColor Red
+        Write-Host "----------------------------------------" -ForegroundColor Red
         
         foreach ($check in $failedChecks) {
             Write-Host ""
@@ -164,24 +160,21 @@ function Show-Report {
         }
     }
     
-    # Passed Summary
     $passedChecks = $Results.Checks | Where-Object { $_.Status -eq "PASS" }
     if ($passedChecks.Count -gt 0) {
         Write-Host ""
         Write-Host "PASSED CRITERIA:" -ForegroundColor Green
-        $passSep = "-" * 40
-        Write-Host $passSep -ForegroundColor Green
+        Write-Host "----------------------------------------" -ForegroundColor Green
         
         foreach ($check in $passedChecks) {
-            Write-Host "✓ $($check.Name)" -ForegroundColor Green
+            Write-Host "V $($check.Name)" -ForegroundColor Green
         }
     }
     
     Write-Host ""
-    Write-Host $separator -ForegroundColor Green
+    Write-Host "============================================================" -ForegroundColor Green
 }
 
-# Export to CSV
 function Export-ToCSV {
     param(
         [AuditResults]$Results,
@@ -192,7 +185,6 @@ function Export-ToCSV {
     Write-Host "Results exported to: $Path" -ForegroundColor Cyan
 }
 
-# Main Function
 function Start-Audit {
     param(
         [switch]$ExportCSV,
@@ -201,18 +193,14 @@ function Start-Audit {
     
     Write-Host "Starting Windows Server Configuration Audit..." -ForegroundColor Green
     
-    # Initialize
     $results = [AuditResults]::new()
     
-    # Run Checks
     Write-Host "Running security privilege checks..." -ForegroundColor Cyan
     Test-SeTcbPrivilege -Results $results
     Test-SeIncreaseQuotaPrivilege -Results $results
     
-    # Show Report
     Show-Report -Results $results
     
-    # Export if requested
     if ($ExportCSV) {
         if ($CSVPath) {
             Export-ToCSV -Results $results -Path $CSVPath
@@ -224,10 +212,8 @@ function Start-Audit {
     return $results
 }
 
-# Auto-run when script is executed directly
 Write-Host "Windows Server Configuration Audit Tool Loaded" -ForegroundColor Green
-Write-Host "Usage: Start-Audit [-ExportCSV] [-CSVPath 'path']" -ForegroundColor Yellow
+Write-Host "Usage: Start-Audit or Start-Audit -ExportCSV" -ForegroundColor Yellow
 Write-Host ""
 
-# Uncomment the line below to auto-run
 Start-Audit -ExportCSV
