@@ -163,16 +163,16 @@ function Generate-Report {
     $Results.UpdateStatistics()
     
     Write-Host "`n" -ForegroundColor Green
-    Write-Host "=" * 80 -ForegroundColor Green
+    Write-Host ("=" * 80) -ForegroundColor Green
     Write-Host "WINDOWS SERVER CONFIGURATION AUDIT REPORT" -ForegroundColor Green
-    Write-Host "=" * 80 -ForegroundColor Green
+    Write-Host ("=" * 80) -ForegroundColor Green
     Write-Host "Scan Date: $($Results.StartTime.ToString('yyyy-MM-dd HH:mm:ss'))" -ForegroundColor Cyan
     Write-Host "Duration: $([math]::Round(($Results.EndTime - $Results.StartTime).TotalSeconds, 2)) seconds" -ForegroundColor Cyan
     Write-Host ""
     
     # Summary Statistics
     Write-Host "SUMMARY STATISTICS:" -ForegroundColor Yellow
-    Write-Host "-" * 50 -ForegroundColor Yellow
+    Write-Host ("-" * 50) -ForegroundColor Yellow
     Write-Host "Total Criteria Scanned: $($Results.TotalChecks)" -ForegroundColor White
     Write-Host "PASSED: $($Results.PassedChecks)" -ForegroundColor Green
     Write-Host "FAILED: $($Results.FailedChecks)" -ForegroundColor Red
@@ -188,7 +188,7 @@ function Generate-Report {
     $failedChecks = $Results.Checks | Where-Object { $_.Status -eq "FAIL" }
     if ($failedChecks.Count -gt 0) {
         Write-Host "FAILED CRITERIA DETAILS:" -ForegroundColor Red
-        Write-Host "-" * 50 -ForegroundColor Red
+        Write-Host ("-" * 50) -ForegroundColor Red
         
         foreach ($check in $failedChecks) {
             Write-Host ""
@@ -204,7 +204,7 @@ function Generate-Report {
     if ($errorChecks.Count -gt 0) {
         Write-Host ""
         Write-Host "ERROR CHECKS:" -ForegroundColor Magenta
-        Write-Host "-" * 50 -ForegroundColor Magenta
+        Write-Host ("-" * 50) -ForegroundColor Magenta
         
         foreach ($check in $errorChecks) {
             Write-Host ""
@@ -218,7 +218,7 @@ function Generate-Report {
     if ($passedChecks.Count -gt 0) {
         Write-Host ""
         Write-Host "PASSED CRITERIA:" -ForegroundColor Green
-        Write-Host "-" * 50 -ForegroundColor Green
+        Write-Host ("-" * 50) -ForegroundColor Green
         
         foreach ($check in $passedChecks) {
             Write-Host "✓ $($check.Name)" -ForegroundColor Green
@@ -226,7 +226,7 @@ function Generate-Report {
     }
     
     Write-Host ""
-    Write-Host "=" * 80 -ForegroundColor Green
+    Write-Host ("=" * 80) -ForegroundColor Green
 }
 
 # Function to export results to CSV
