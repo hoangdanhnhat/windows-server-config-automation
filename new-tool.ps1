@@ -1203,7 +1203,7 @@ function Show-Report {
         
         foreach ($check in $failedChecks) {
             Write-Host ""
-            Write-Host "X $($check.Name) - Sensitivity: $($Sensitivity)" -ForegroundColor Red
+            Write-Host "X $($check.Name) - Sensitivity: $($check.Sensitivity)" -ForegroundColor Red
             Write-Host "  Category: $($check.Category)" -ForegroundColor Gray
             Write-Host "  Description: $($check.Description)" -ForegroundColor Gray
             Write-Host "  Details: $($check.Details)" -ForegroundColor Yellow
