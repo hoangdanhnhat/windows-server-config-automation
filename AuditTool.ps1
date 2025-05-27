@@ -1404,12 +1404,12 @@ function Show-Report {
     
     Write-Host ""
     Write-Host "============================================================" -ForegroundColor Green
-    Write-Host "WINDOWS SERVER CONFIGURATION AUDIT REPORT" -ForegroundColor Green
+    Write-Host "        WINDOWS SERVER CONFIGURATION AUDIT REPORT" -ForegroundColor Green
     Write-Host "============================================================" -ForegroundColor Green
     Write-Host "Scan Date: $($Results.StartTime.ToString('yyyy-MM-dd HH:mm:ss'))" -ForegroundColor Cyan
     Write-Host ""
     
-    Write-Host "SUMMARY:" -ForegroundColor Yellow
+    Write-Host "               SUMMARY:" -ForegroundColor Yellow
     Write-Host "----------------------------------------" -ForegroundColor Yellow
     Write-Host "Total Criteria Scanned: $($Results.Total)" -ForegroundColor White
     Write-Host "PASSED: $($Results.Passed)" -ForegroundColor Green
@@ -1425,7 +1425,7 @@ function Show-Report {
     
     $failedChecks = $Results.Checks | Where-Object { $_.Status -eq "FAIL" }
     if ($failedChecks.Count -gt 0) {
-        Write-Host "FAILED CRITERIA DETAILS:" -ForegroundColor Red
+        Write-Host "        FAILED CRITERIA DETAILS:" -ForegroundColor Red
         Write-Host "----------------------------------------" -ForegroundColor Red
         
         foreach ($check in $failedChecks) {
@@ -1440,7 +1440,7 @@ function Show-Report {
     $passedChecks = $Results.Checks | Where-Object { $_.Status -eq "PASS" }
     if ($passedChecks.Count -gt 0) {
         Write-Host ""
-        Write-Host "PASSED CRITERIA:" -ForegroundColor Green
+        Write-Host "           PASSED CRITERIA:" -ForegroundColor Green
         Write-Host "----------------------------------------" -ForegroundColor Green
         
         foreach ($check in $passedChecks) {
