@@ -91,7 +91,7 @@ function Test-SeIncreaseQuotaPrivilege {
     
     $check = [ConfigCheck]::new(
         "2.2.6",
-        "SeIncreaseQuotaPrivilege", 
+        "SeIncreaseQuotaPrivilege",
         "Only approved accounts should have Adjust memory quotas privilege",
         7,
         "Security Privileges"
@@ -1180,6 +1180,112 @@ function Test-SeRelabelPrivilege {
     $Results.AddCheck($check)
 }
 
+function Test-SeSystemEnvironmentPrivilege {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.41",
+        "SeSystemEnvironmentPrivilege",
+        "Modify nonvolatile RAM environment values should be restricted to Administrators",
+        9,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeSystemEnvironmentPrivilege"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "Administrators",
+                "BUILTIN\Administrators"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have system environment privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SeManageVolumePrivilege {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.42",
+        "SeManageVolumePrivilege",
+        "Perform volume maintenance tasks should be restricted to Administrators",
+        8,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeManageVolumePrivilege"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "Administrators",
+                "BUILTIN\Administrators"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have volume maintenance tasks privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
 # Report Generation
 function Show-Report {
     param([AuditResults]$Results)
@@ -1285,6 +1391,8 @@ function Start-Audit {
     Test-SeLockMemoryPrivilege -Results $results
     Test-SeSecurityPrivilege -Results $results
     Test-SeRelabelPrivilege -Results $results
+    Test-SeSystemEnvironmentPrivilege -Results $results
+    Test-SeManageVolumePrivilege -Results $results
     
     Show-Report -Results $results
     
