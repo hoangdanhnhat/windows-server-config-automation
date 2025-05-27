@@ -106,7 +106,14 @@ function Test-SeIncreaseQuotaPrivilege {
         
         if ($line) {
             $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
-            $validAccounts = @("*S-1-5-32-544", "*S-1-5-19", "*S-1-5-20", "Administrators", "LOCAL SERVICE", "NETWORK SERVICE")
+            $validAccounts = @(
+                "*S-1-5-32-544", 
+                "*S-1-5-19", 
+                "*S-1-5-20", 
+                "Administrators", 
+                "LOCAL SERVICE", 
+                "NETWORK SERVICE"
+                )
             
             $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
             
@@ -155,7 +162,11 @@ function Test-SeBackupPrivilege {
         
         if ($line) {
             $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
-            $validAccounts = @("Administrators", "BUILTIN\Server Operators", "BUILTIN\Backup Operators")
+            $validAccounts = @(
+                "*S-1-5-32-544",   # Administrators
+                "Administrators", 
+                "*S-1-5-32-551"    # Backup Operators
+                )
             
             $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
             
@@ -204,7 +215,12 @@ function Test-SeSystemTimePrivilege {
         
         if ($line) {
             $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
-            $validAccounts = @("Administrators", "LOCAL SERVICE")
+            $validAccounts = @(
+                "*S-1-5-32-544",   # Administrators
+                "*S-1-5-19",       # LOCAL SERVICE
+                "Administrators", 
+                "LOCAL SERVICE"
+                )
             
             $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
             
@@ -444,6 +460,7 @@ function Test-SeCreateGlobalPrivilege {
                 "*S-1-5-32-544",    # Administrators
                 "*S-1-5-19",        # LOCAL SERVICE
                 "*S-1-5-20",        # NETWORK SERVICE
+                "*S-1-5-64",        # Service
                 "Administrators",
                 "LOCAL SERVICE",
                 "NETWORK SERVICE",
@@ -895,13 +912,8 @@ function Test-SeImpersonatePrivilege {
                 "*S-1-5-32-544",    # Administrators
                 "*S-1-5-19",        # LOCAL SERVICE
                 "*S-1-5-20",        # NETWORK SERVICE
-                "Administrators",
-                "LOCAL SERVICE",
-                "NETWORK SERVICE",
-                "SERVICE",
-                "IIS_IUSRS",
-                "NT AUTHORITY\LOCAL SERVICE",
-                "NT AUTHORITY\NETWORK SERVICE"
+                "*S-1-5-6",         # SERVICE
+                "*S-1-5-32-568"     # IIS Users
             )
             
             $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
@@ -953,8 +965,7 @@ function Test-SeIncreaseBasePriorityPrivilege {
             $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
             $validAccounts = @(
                 "*S-1-5-32-544",    # Administrators
-                "Administrators",
-                "BUILTIN\Administrators",
+                "*S-1-5-90-0",      # Window Manager
                 "Window Manager\Window Manager Group"
             )
             
