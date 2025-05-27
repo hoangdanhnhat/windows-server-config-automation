@@ -460,7 +460,7 @@ function Test-SeCreateGlobalPrivilege {
                 "*S-1-5-32-544",    # Administrators
                 "*S-1-5-19",        # LOCAL SERVICE
                 "*S-1-5-20",        # NETWORK SERVICE
-                "*S-1-5-64",        # Service
+                "*S-1-5-6",         # SERVICE
                 "Administrators",
                 "LOCAL SERVICE",
                 "NETWORK SERVICE",
