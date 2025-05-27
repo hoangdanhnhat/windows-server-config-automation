@@ -54,7 +54,7 @@ function Test-SeTcbPrivilege {
         "SeTcbPrivilege", 
         "No accounts should have Act as part of OS privilege",
         10,
-        "Security Privileges"
+        "User Rights Test"
         )
     
     try {
@@ -93,7 +93,7 @@ function Test-SeIncreaseQuotaPrivilege {
         "SeIncreaseQuotaPrivilege",
         "Only approved accounts should have Adjust memory quotas privilege",
         7,
-        "Security Privileges"
+        "User Rights Test"
         )
     
     try {
@@ -256,7 +256,7 @@ function Test-SeTimeZonePrivilege {
         "SeTimeZonePrivilege",
         "Change the time zone privilege should be restricted",
         1,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -312,7 +312,7 @@ function Test-SeCreatePagefilePrivilege {
         "SeCreatePagefilePrivilege",
         "Create a pagefile privilege should be restricted",
         6,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -365,7 +365,7 @@ function Test-SeCreateTokenPrivilege {
         "SeCreateTokenPrivilege",
         "Create a token object privilege should not be assigned",
         10,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -404,7 +404,7 @@ function Test-SeTrustedCredManAccessPrivilege {
         "SeTrustedCredManAccessPrivilege",
         "Access Credential Manager as a trusted caller should not be assigned",
         10,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -443,7 +443,7 @@ function Test-SeCreateGlobalPrivilege {
         "SeCreateGlobalPrivilege",
         "Create global objects privilege should be restricted",
         7,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -501,7 +501,7 @@ function Test-SeCreatePermanentPrivilege {
         "SeCreatePermanentPrivilege",
         "Create permanent shared objects privilege should not be assigned",
         6,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -540,7 +540,7 @@ function Test-SeCreateSymbolicLinkPrivilege {
         "SeCreateSymbolicLinkPrivilege",
         "Create symbolic links privilege should be restricted",
         10,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -593,7 +593,7 @@ function Test-SeDebugPrivilege {
         "SeDebugPrivilege",
         "Debug privilege should be restricted",
         10,
-        "Security Privileges"
+        "User Rights Test"
     )
 
     try {
@@ -645,7 +645,7 @@ function Test-SeDenyBatchLogonRight {
         "SeDenyBatchLogonRight",
         "Deny log on as batch job should include Guests",
         5,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -696,7 +696,7 @@ function Test-SeDenyServiceLogonRight {
         "SeDenyServiceLogonRight",
         "Deny log on as a service should include Guests",
         5,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -747,7 +747,7 @@ function Test-SeEnableDelegationPrivilege {
         "SeEnableDelegationPrivilege",
         "Enable computer and user accounts to be trusted for delegation should not be assigned",
         9,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -786,7 +786,7 @@ function Test-SeRemoteShutdownPrivilege {
         "SeRemoteShutdownPrivilege",
         "Force shutdown from a remote system should be restricted",
         9,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -839,7 +839,7 @@ function Test-SeAuditPrivilege {
         "SeAuditPrivilege",
         "Generate security audits should be restricted",
         9,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -895,7 +895,7 @@ function Test-SeImpersonatePrivilege {
         "SeImpersonatePrivilege",
         "Impersonate a client after authentication should be restricted",
         10,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -950,7 +950,7 @@ function Test-SeIncreaseBasePriorityPrivilege {
         "SeIncreaseBasePriorityPrivilege",
         "Increase scheduling priority should be restricted",
         8,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -1003,7 +1003,7 @@ function Test-SeLoadDriverPrivilege {
         "SeLoadDriverPrivilege",
         "Load and unload device drivers should be restricted",
         10,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -1056,7 +1056,7 @@ function Test-SeLockMemoryPrivilege {
         "SeLockMemoryPrivilege",
         "Lock pages in memory should not be assigned",
         9,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -1095,7 +1095,7 @@ function Test-SeSecurityPrivilege {
         "SeSecurityPrivilege",
         "Manage auditing and security log should be restricted (Member Server only)",
         10,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -1148,7 +1148,7 @@ function Test-SeRelabelPrivilege {
         "SeRelabelPrivilege",
         "Modify an object label should not be assigned",
         7,
-        "Security Privileges"
+        "User Rights Test"
     )
     
     try {
@@ -1396,6 +1396,222 @@ function Test-SeSystemProfilePrivilege {
     $Results.AddCheck($check)
 }
 
+function Test-SeAssignPrimaryTokenPrivilege {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.45",
+        "SeAssignPrimaryTokenPrivilege",
+        "Ensure primary token privilege is restricted to LOCAL SERVICE and NETWORK SERVICE",
+        8,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeAssignPrimaryTokenPrivilege"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-19",        # LOCAL SERVICE
+                "*S-1-5-20",        # NETWORK SERVICE
+                "LOCAL SERVICE",
+                "NETWORK SERVICE",
+                "NT AUTHORITY\LOCAL SERVICE",
+                "NT AUTHORITY\NETWORK SERVICE"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SeRestorePrivilege {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.46",
+        "SeRestorePrivilege",
+        "Restore privilege should be restricted to Administrators",
+        9,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeRestorePrivilege"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "Administrators",
+                "BUILTIN\Administrators"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SeShutdownPrivilege {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.47",
+        "SeShutdownPrivilege",
+        "System shutdown privilege should be restricted to Administrators",
+        8,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeShutdownPrivilege"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "Administrators",
+                "BUILTIN\Administrators"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SeTakeOwnershipPrivilege {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.48",
+        "SeTakeOwnershipPrivilege",
+        "Take ownership privilege should be restricted to Administrators",
+        9,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeTakeOwnershipPrivilege"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "Administrators",
+                "BUILTIN\Administrators"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+
 # Report Generation
 function Show-Report {
     param([AuditResults]$Results)
@@ -1505,6 +1721,10 @@ function Start-Audit {
     Test-SeManageVolumePrivilege -Results $results
     Test-SeProfileSingleProcessPrivilege -Results $results
     Test-SeSystemProfilePrivilege -Results $results
+    Test-SeAssignPrimaryTokenPrivilege -Results $results
+    Test-SeRestorePrivilege -Results $results
+    Test-SeShutdownPrivilege -Results $results
+    Test-SeTakeOwnershipPrivilege -Results $results
     
     Show-Report -Results $results
     
