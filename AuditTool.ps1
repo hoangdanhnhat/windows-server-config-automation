@@ -91,7 +91,7 @@ function Test-SeIncreaseQuotaPrivilege {
     
     $check = [ConfigCheck]::new(
         "2.2.6",
-        "SeIncreaseQuotaPrivilege", 
+        "SeIncreaseQuotaPrivilege",
         "Only approved accounts should have Adjust memory quotas privilege",
         7,
         "Security Privileges"
@@ -106,7 +106,14 @@ function Test-SeIncreaseQuotaPrivilege {
         
         if ($line) {
             $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
-            $validAccounts = @("*S-1-5-32-544", "*S-1-5-19", "*S-1-5-20", "Administrators", "LOCAL SERVICE", "NETWORK SERVICE")
+            $validAccounts = @(
+                "*S-1-5-32-544", 
+                "*S-1-5-19", 
+                "*S-1-5-20", 
+                "Administrators", 
+                "LOCAL SERVICE", 
+                "NETWORK SERVICE"
+                )
             
             $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
             
@@ -118,8 +125,8 @@ function Test-SeIncreaseQuotaPrivilege {
                 $check.Details = "Invalid accounts: $($invalidAccounts -join ', ') | Full: $line"
             }
         } else {
-            $check.Status = "PASS"
-            $check.Details = "No accounts have SeIncreaseQuotaPrivilege"
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
         }
     }
     catch {
@@ -155,7 +162,11 @@ function Test-SeBackupPrivilege {
         
         if ($line) {
             $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
-            $validAccounts = @("Administrators", "BUILTIN\Server Operators", "BUILTIN\Backup Operators")
+            $validAccounts = @(
+                "*S-1-5-32-544",   # Administrators
+                "Administrators", 
+                "*S-1-5-32-551"    # Backup Operators
+                )
             
             $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
             
@@ -167,8 +178,8 @@ function Test-SeBackupPrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
-            $check.Details = "No accounts have '$privilege' privilege"
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
         }
     }
     catch {
@@ -204,7 +215,12 @@ function Test-SeSystemTimePrivilege {
         
         if ($line) {
             $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
-            $validAccounts = @("Administrators", "LOCAL SERVICE")
+            $validAccounts = @(
+                "*S-1-5-32-544",   # Administrators
+                "*S-1-5-19",       # LOCAL SERVICE
+                "Administrators", 
+                "LOCAL SERVICE"
+                )
             
             $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
             
@@ -216,8 +232,8 @@ function Test-SeSystemTimePrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
-            $check.Details = "No accounts have '$privilege' privilege"
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have '$privilege'"
         }
     }
     catch {
@@ -272,7 +288,7 @@ function Test-SeTimeZonePrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
+            $check.Status = "FAIL"
             $check.Details = "No accounts have $privilege privilege"
         }
     }
@@ -325,8 +341,8 @@ function Test-SeCreatePagefilePrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
-            $check.Details = "No accounts have $privilege privilege"
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
         }
     }
     catch {
@@ -444,6 +460,7 @@ function Test-SeCreateGlobalPrivilege {
                 "*S-1-5-32-544",    # Administrators
                 "*S-1-5-19",        # LOCAL SERVICE
                 "*S-1-5-20",        # NETWORK SERVICE
+                "*S-1-5-6",         # SERVICE
                 "Administrators",
                 "LOCAL SERVICE",
                 "NETWORK SERVICE",
@@ -460,7 +477,7 @@ function Test-SeCreateGlobalPrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
+            $check.Status = "FAIL"
             $check.Details = "No accounts have $privilege"
         }
     }
@@ -552,7 +569,7 @@ function Test-SeCreateSymbolicLinkPrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
+            $check.Status = "FAIL"
             $check.Details = "No accounts have $privilege"
         }
     }
@@ -603,7 +620,7 @@ function Test-SeDebugPrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
+            $check.Status = "FAIL"
             $check.Details = "No accounts have $privilege"
         }
     }
@@ -798,7 +815,7 @@ function Test-SeRemoteShutdownPrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
+            $check.Status = "FAIL"
             $check.Details = "No accounts have $privilege"
         }
     }
@@ -854,7 +871,7 @@ function Test-SeAuditPrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
+            $check.Status = "FAIL"
             $check.Details = "No accounts have $privilege"
         }
     }
@@ -895,13 +912,8 @@ function Test-SeImpersonatePrivilege {
                 "*S-1-5-32-544",    # Administrators
                 "*S-1-5-19",        # LOCAL SERVICE
                 "*S-1-5-20",        # NETWORK SERVICE
-                "Administrators",
-                "LOCAL SERVICE",
-                "NETWORK SERVICE",
-                "SERVICE",
-                "IIS_IUSRS",
-                "NT AUTHORITY\LOCAL SERVICE",
-                "NT AUTHORITY\NETWORK SERVICE"
+                "*S-1-5-6",         # SERVICE
+                "*S-1-5-32-568"     # IIS Users
             )
             
             $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
@@ -914,7 +926,7 @@ function Test-SeImpersonatePrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
+            $check.Status = "FAIL"
             $check.Details = "No accounts have $privilege"
         }
     }
@@ -953,8 +965,7 @@ function Test-SeIncreaseBasePriorityPrivilege {
             $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
             $validAccounts = @(
                 "*S-1-5-32-544",    # Administrators
-                "Administrators",
-                "BUILTIN\Administrators",
+                "*S-1-5-90-0",      # Window Manager
                 "Window Manager\Window Manager Group"
             )
             
@@ -968,7 +979,7 @@ function Test-SeIncreaseBasePriorityPrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
+            $check.Status = "FAIL"
             $check.Details = "No accounts have $privilege"
         }
     }
@@ -1021,7 +1032,7 @@ function Test-SeLoadDriverPrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
+            $check.Status = "FAIL"
             $check.Details = "No accounts have $privilege"
         }
     }
@@ -1113,7 +1124,7 @@ function Test-SeSecurityPrivilege {
                 $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
             }
         } else {
-            $check.Status = "PASS"
+            $check.Status = "FAIL"
             $check.Details = "No accounts have $privilege"
         }
     }
@@ -1153,6 +1164,223 @@ function Test-SeRelabelPrivilege {
             $check.Details = "Found accounts with $privilege : $line"
         } else {
             $check.Status = "PASS"
+            $check.Details = "No accounts have $privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SeSystemEnvironmentPrivilege {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.41",
+        "SeSystemEnvironmentPrivilege",
+        "Modify nonvolatile RAM environment values should be restricted to Administrators",
+        9,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeSystemEnvironmentPrivilege"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "Administrators",
+                "BUILTIN\Administrators"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SeManageVolumePrivilege {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.42",
+        "SeManageVolumePrivilege",
+        "Perform volume maintenance tasks should be restricted to Administrators",
+        9,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeManageVolumePrivilege"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "Administrators",
+                "BUILTIN\Administrators"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SeProfileSingleProcessPrivilege {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.43",
+        "SeProfileSingleProcessPrivilege",
+        "Profile single process privilege should be restricted to Administrators",
+        7,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeProfileSingleProcessPrivilege"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "Administrators",
+                "BUILTIN\Administrators"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SeSystemProfilePrivilege {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.44",
+        "SeSystemProfilePrivilege",
+        "Profile system performance privilege should be restricted to Administrators and WdiServiceHost",
+        8,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeSystemProfilePrivilege"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "Administrators",
+                "BUILTIN\Administrators",
+                "*S-1-5-80-*",      # NT SERVICE\WdiServiceHost
+                "NT SERVICE\WdiServiceHost"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { 
+                $acc = $_
+                -not ($validAccounts | Where-Object { $acc -like $_ })
+            }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
             $check.Details = "No accounts have $privilege"
         }
     }
@@ -1274,6 +1502,10 @@ function Start-Audit {
     Test-SeLockMemoryPrivilege -Results $results
     Test-SeSecurityPrivilege -Results $results
     Test-SeRelabelPrivilege -Results $results
+    Test-SeSystemEnvironmentPrivilege -Results $results
+    Test-SeManageVolumePrivilege -Results $results
+    Test-SeProfileSingleProcessPrivilege -Results $results
+    Test-SeSystemProfilePrivilege -Results $results
     
     Show-Report -Results $results
     
