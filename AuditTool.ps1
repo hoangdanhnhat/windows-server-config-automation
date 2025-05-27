@@ -1,5 +1,4 @@
 # Windows Server Configuration Audit Tool
-# Clean Version - No Complex String Operations
 
 # Configuration Check Class
 class ConfigCheck {
