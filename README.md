@@ -7,5 +7,5 @@ python main.py
 or
 
 ```
-.\new-tool.ps1
+.\AuditTool.ps1
 ```
