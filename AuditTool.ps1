@@ -659,8 +659,8 @@ function Test-SeDenyBatchLogonRight {
             $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
             $validAccounts = @(
                 "*S-1-5-32-546",    # Guests
-                "Guests",
-                "BUILTIN\Guests"
+                "Guest",
+                "BUILTIN\Guest"
             )
             
             if ($accounts | Where-Object { $_ -in $validAccounts }) {
@@ -710,8 +710,8 @@ function Test-SeDenyServiceLogonRight {
             $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
             $validAccounts = @(
                 "*S-1-5-32-546",    # Guests
-                "Guests",
-                "BUILTIN\Guests"
+                "Guest",
+                "BUILTIN\Guest"
             )
             
             if ($accounts | Where-Object { $_ -in $validAccounts }) {
