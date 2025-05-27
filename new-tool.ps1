@@ -125,8 +125,8 @@ function Test-SeIncreaseQuotaPrivilege {
                 $check.Details = "Invalid accounts: $($invalidAccounts -join ', ') | Full: $line"
             }
         } else {
-            $check.Status = "PASS"
-            $check.Details = "No accounts have SeIncreaseQuotaPrivilege"
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
         }
     }
     catch {
