@@ -94,6 +94,115 @@ function Test-SeIncreaseQuotaPrivilege {
     $Results.AddCheck($check)
 }
 
+function Test-SeInteractiveLogonRight {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.8",
+        "SeInteractiveLogonRight",
+        "Ensure 'Allow log on locally' is set to 'Administrators'",
+        5,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeInteractiveLogonRight"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "Administrators",
+                "BUILTIN\Administrators"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SeRemoteInteractiveLogonRight {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.10",
+        "SeRemoteInteractiveLogonRight",
+        "Ensure 'Allow log on through Remote Desktop Services' is set to 'Administrators, Remote Desktop Users'",
+        5,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeRemoteInteractiveLogonRight"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "*S-1-5-32-555",    # Remote Desktop Users
+                "Administrators",
+                "Remote Desktop Users",
+                "BUILTIN\Administrators",
+                "BUILTIN\Remote Desktop Users"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
 function Test-SeBackupPrivilege {
     param([AuditResults]$Results)
     
@@ -677,6 +786,171 @@ function Test-SeDenyServiceLogonRight {
         } else {
             $check.Status = "FAIL"
             $check.Details = "No deny service logon rights configured"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SeDenyNetworkLogonRight {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.22",
+        "SeDenyNetworkLogonRight",
+        "Ensure 'Deny access to this computer from the network' includes 'Guests, Local account and member of Administrators group'",
+        5,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeDenyNetworkLogonRight"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $requiredAccounts = @(
+                "*S-1-5-32-546",    # Guests
+                "*S-1-5-114",       # Local accounts and Members of the administrators group
+                "Guests",
+                "Local accounts and Members of the administrators group"
+            )
+            
+            $missingAccounts = $requiredAccounts | Where-Object { 
+                $req = $_
+                -not ($accounts | Where-Object { $_ -like $req })
+            }
+            
+            if ($missingAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "Required accounts are denied network logon"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Missing required accounts: $($missingAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No deny network logon rights configured"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SeDenyInteractiveLogonRight {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.25",
+        "SeDenyInteractiveLogonRight",
+        "Ensure 'Deny log on locally' includes 'Guests'",
+        5,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeDenyInteractiveLogonRight"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $requiredAccounts = @(
+                "*S-1-5-32-546",    # Guests
+                "Guests",
+                "BUILTIN\Guests"
+            )
+            
+            if ($accounts | Where-Object { $_ -in $requiredAccounts }) {
+                $check.Status = "PASS"
+                $check.Details = "Guests group is denied interactive logon"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Guests group is not denied interactive logon. Current settings: $($accounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No deny interactive logon rights configured"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SeDenyRemoteInteractiveLogonRight {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.27",
+        "SeDenyRemoteInteractiveLogonRight",
+        "Ensure 'Deny log on through Remote Desktop Services' includes 'Guests, Local account'",
+        5,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeDenyRemoteInteractiveLogonRight"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $requiredAccounts = @(
+                "*S-1-5-32-546",    # Guests
+                "*S-1-5-113",       # Local account
+                "Guests",
+                "Local account"
+            )
+            
+            $missingAccounts = $requiredAccounts | Where-Object { 
+                $req = $_
+                -not ($accounts | Where-Object { $_ -like $req })
+            }
+            
+            if ($missingAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "Required accounts are denied remote interactive logon"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Missing required accounts: $($missingAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No deny remote interactive logon rights configured"
         }
     }
     catch {
@@ -1535,6 +1809,62 @@ function Test-SeTakeOwnershipPrivilege {
             $validAccounts = @(
                 "*S-1-5-32-544",    # Administrators
                 "Administrators",
+                "BUILTIN\Administrators"
+            )
+            
+            $invalidAccounts = $accounts | Where-Object { $_ -notin $validAccounts }
+            
+            if ($invalidAccounts.Count -eq 0) {
+                $check.Status = "PASS"
+                $check.Details = "All accounts approved: $($accounts -join ', ')"
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "Invalid accounts found: $($invalidAccounts -join ', ')"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "No accounts have $privilege"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking privilege: $($_.Exception.Message)"
+    }
+    finally {
+        if (Test-Path C:\secpol.cfg) {
+            Remove-Item C:\secpol.cfg -Force -ErrorAction SilentlyContinue
+        }
+    }
+    
+    $Results.AddCheck($check)
+}
+
+
+function Test-SeNetworkLogonRight {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.2.38",
+        "SeNetworkLogonRight",
+        "Ensure 'Access this computer from the network' is set to 'Administrators, Authenticated Users'",
+        5,
+        "User Rights Test"
+    )
+    
+    try {
+        $privilege = "SeNetworkLogonRight"
+        secedit /export /cfg C:\secpol.cfg | Out-Null
+        $content = Get-Content C:\secpol.cfg -ErrorAction Stop
+        
+        $line = $content | Where-Object { $_ -match "^$privilege\s*=" }
+        
+        if ($line) {
+            $accounts = $line -replace "^$privilege\s*=\s*", "" -split ',' | ForEach-Object { $_.Trim() }
+            $validAccounts = @(
+                "*S-1-5-32-544",    # Administrators
+                "*S-1-5-11",        # Authenticated Users
+                "Administrators",
+                "Authenticated Users",
                 "BUILTIN\Administrators"
             )
             
