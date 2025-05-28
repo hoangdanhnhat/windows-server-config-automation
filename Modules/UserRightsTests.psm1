@@ -100,7 +100,7 @@ function Test-SeInteractiveLogonRight {
     $check = [ConfigCheck]::new(
         "2.2.8",
         "SeInteractiveLogonRight",
-        "Ensure 'Allow log on locally' is set to 'Administrators'",
+        "Allow log on locally should be restricted",
         5,
         "User Rights Test"
     )
@@ -153,7 +153,7 @@ function Test-SeRemoteInteractiveLogonRight {
     $check = [ConfigCheck]::new(
         "2.2.10",
         "SeRemoteInteractiveLogonRight",
-        "Ensure 'Allow log on through Remote Desktop Services' is set to 'Administrators, Remote Desktop Users'",
+        "Allow log on through Remote Desktop Services should be restricted",
         5,
         "User Rights Test"
     )
@@ -807,7 +807,7 @@ function Test-SeDenyNetworkLogonRight {
     $check = [ConfigCheck]::new(
         "2.2.22",
         "SeDenyNetworkLogonRight",
-        "Ensure 'Deny access to this computer from the network' includes 'Guests, Local account and member of Administrators group'",
+        "Deny access to this computer from the network should includes recommend accounts",
         5,
         "User Rights Test"
     )
@@ -915,7 +915,7 @@ function Test-SeDenyRemoteInteractiveLogonRight {
     $check = [ConfigCheck]::new(
         "2.2.27",
         "SeDenyRemoteInteractiveLogonRight",
-        "Ensure 'Deny log on through Remote Desktop Services' includes 'Guests, Local account'",
+        "Deny log on through Remote Desktop Services should include recommend accounts",
         5,
         "User Rights Test"
     )
@@ -1839,14 +1839,13 @@ function Test-SeTakeOwnershipPrivilege {
     $Results.AddCheck($check)
 }
 
-
 function Test-SeNetworkLogonRight {
     param([AuditResults]$Results)
     
     $check = [ConfigCheck]::new(
         "2.2.38",
         "SeNetworkLogonRight",
-        "Ensure 'Access this computer from the network' is set to 'Administrators, Authenticated Users'",
+        "Access this computer from the network should be restricted",
         5,
         "User Rights Test"
     )
