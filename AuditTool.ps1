@@ -134,11 +134,16 @@ function Start-Audit {
 
     # Get all exported functions from UserRightsTests module
     $userRightsFunctions = Get-Command -Module UserRightsTests | Where-Object { $_.Name -like 'Test-*' }
-    
     foreach ($function in $userRightsFunctions) {
         & $function.Name -Results $results
     }
     
+    # Get all exported function from RegistryTests module
+    $registryTestFunction = Get-Command -Module RegistryTests | Where-Object {$_.Name -like 'Test-*'}
+    foreach ($function in $registryTestFunction) {
+        & $function.Name -Results $results
+    }
+
     Show-Report -Results $results
     
     if ($ExportCSV) {
