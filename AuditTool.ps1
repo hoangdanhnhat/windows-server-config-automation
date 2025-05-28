@@ -7,31 +7,6 @@ Import-Module (Join-Path $ModulePath "SharedTypes.psm1") -Force
 Import-Module (Join-Path $ModulePath "UserRightsTests.psm1") -Force
 Import-Module (Join-Path $ModulePath "RegistryTests.psm1") -Force
 
-# Results Class
-class AuditResults {
-    [System.Collections.ArrayList]$Checks
-    [int]$Total
-    [int]$Passed
-    [int]$Failed
-    [datetime]$StartTime
-    
-    AuditResults() {
-        $this.Checks = New-Object System.Collections.ArrayList
-        $this.StartTime = Get-Date
-    }
-    
-    [void]AddCheck([ConfigCheck]$check) {
-        $this.Checks.Add($check) | Out-Null
-    }
-    
-    [void]UpdateStats() {
-        $this.Total = $this.Checks.Count
-        $this.Passed = ($this.Checks | Where-Object { $_.Status -eq "PASS" }).Count
-        $this.Failed = ($this.Checks | Where-Object { $_.Status -eq "FAIL" }).Count
-    }
-}
-
-
 # Report Generation
 function Show-Report {
     param([AuditResults]$Results)
