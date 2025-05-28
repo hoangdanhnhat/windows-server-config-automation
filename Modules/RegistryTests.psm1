@@ -1,3 +1,5 @@
+using module .\SharedTypes.psm1
+
 function Test-DisallowExploitProtectionOverride {
     param([AuditResults]$Results)
     

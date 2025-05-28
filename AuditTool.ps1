@@ -1,29 +1,11 @@
 # Windows Server Configuration Audit Tool
 
 $ModulePath = Join-Path $PSScriptRoot "Modules"
+
+# Import shared types first
+Import-Module (Join-Path $ModulePath "SharedTypes.psm1") -Force
 Import-Module (Join-Path $ModulePath "UserRightsTests.psm1") -Force
 Import-Module (Join-Path $ModulePath "RegistryTests.psm1") -Force
-
-# Configuration Check Class
-class ConfigCheck {
-    [string]$CISID
-    [string]$Name
-    [string]$Description
-    [int16]$Sensitivity  
-    [string]$Status
-    [string]$Details
-    [string]$Category
-    
-    ConfigCheck([string]$CISID, [string]$name, [string]$desc, [int16]$Sensitivity, [string]$cat) {
-        $this.CISID = $CISID
-        $this.Name = $name
-        $this.Description = $desc
-        $this.Sensitivity = $Sensitivity
-        $this.Category = $cat
-        $this.Status = "NOT_CHECKED"
-        $this.Details = ""
-    }
-}
 
 # Results Class
 class AuditResults {

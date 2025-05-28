@@ -1,3 +1,5 @@
+using module .\SharedTypes.psm1
+
 # Check Functions
 function Test-SeTcbPrivilege {
     param([AuditResults]$Results)
