@@ -2,6 +2,7 @@
 
 $ModulePath = Join-Path $PSScriptRoot "Modules"
 Import-Module (Join-Path $ModulePath "UserRightsTests.psm1") -Force
+Import-Module (Join-Path $ModulePath "RegistryTests.psm1") -Force
 
 # Configuration Check Class
 class ConfigCheck {
@@ -138,9 +139,11 @@ function Start-Audit {
         & $function.Name -Results $results
     }
     
-    # Get all exported function from RegistryTests module
-    $registryTestFunction = Get-Command -Module RegistryTests | Where-Object {$_.Name -like 'Test-*'}
-    foreach ($function in $registryTestFunction) {
+    Write-Host "Running registry checks..." -ForegroundColor Cyan
+    
+    # Get all exported functions from RegistryTests module
+    $registryFunctions = Get-Command -Module RegistryTests | Where-Object { $_.Name -like 'Test-*' }
+    foreach ($function in $registryFunctions) {
         & $function.Name -Results $results
     }
 
