@@ -1,9 +1,10 @@
 # Windows Server Configuration Audit Tool
+using module .\Modules\SharedTypes.psm1
 
 $ModulePath = Join-Path $PSScriptRoot "Modules"
 
 # Import shared types first
-Import-Module (Join-Path $ModulePath "SharedTypes.psm1") -Force
+Import-Module (Join-Path $ModulePath "SharedTypes.psm1") -Force -DisableNameChecking
 Import-Module (Join-Path $ModulePath "UserRightsTests.psm1") -Force
 Import-Module (Join-Path $ModulePath "RegistryTests.psm1") -Force
 
