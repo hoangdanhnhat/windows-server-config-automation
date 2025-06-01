@@ -48,6 +48,7 @@ function Show-Report {
     
     $failedChecks = $Results.Checks | Where-Object { $_.Status -eq "FAIL" }
     if ($failedChecks.Count -gt 0) {
+        Write-Host ""
         Write-Host "        FAILED CRITERIA DETAILS:" -ForegroundColor Red
         Write-Host "----------------------------------------" -ForegroundColor Red
         
@@ -62,6 +63,7 @@ function Show-Report {
     
     $errorChecks = $Results.Checks | Where-Object {$_.Status -eq "ERROR"}
     if ($errorChecks.Count -gt 0) {
+        Write-Host ""
         Write-Host "        ERROR CRITERIA DETAILS:" -ForegroundColor DarkYellow
         Write-Host "----------------------------------------" -ForegroundColor DarkYellow
 
