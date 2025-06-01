@@ -34,6 +34,17 @@ function Show-Report {
     }
     
     Write-Host ""
+
+    $passedChecks = $Results.Checks | Where-Object { $_.Status -eq "PASS" }
+    if ($passedChecks.Count -gt 0) {
+        Write-Host ""
+        Write-Host "           PASSED CRITERIA:" -ForegroundColor Green
+        Write-Host "----------------------------------------" -ForegroundColor Green
+        
+        foreach ($check in $passedChecks) {
+            Write-Host "V $($check.Name)" -ForegroundColor Green
+        }
+    }
     
     $failedChecks = $Results.Checks | Where-Object { $_.Status -eq "FAIL" }
     if ($failedChecks.Count -gt 0) {
@@ -49,14 +60,17 @@ function Show-Report {
         }
     }
     
-    $passedChecks = $Results.Checks | Where-Object { $_.Status -eq "PASS" }
-    if ($passedChecks.Count -gt 0) {
-        Write-Host ""
-        Write-Host "           PASSED CRITERIA:" -ForegroundColor Green
-        Write-Host "----------------------------------------" -ForegroundColor Green
-        
-        foreach ($check in $passedChecks) {
-            Write-Host "V $($check.Name)" -ForegroundColor Green
+    $errorChecks = $Results.Checks | Where-Object {$_.Status -eq "ERROR"}
+    if ($errorChecks.Count -gt 0) {
+        Write-Host "        ERROR CRITERIA DETAILS:" -ForegroundColor DarkYellow
+        Write-Host "----------------------------------------" -ForegroundColor DarkYellow
+
+        foreach ($check in $errorChecks) {
+            Write-Host ""
+            Write-Host "X $($check.Name) - CISID: $($check.CISID) - Sensitivity: $($check.Sensitivity)" -ForegroundColor DarkYellow
+            Write-Host "  Category: $($check.Category)" -ForegroundColor Gray
+            Write-Host "  Description: $($check.Description)" -ForegroundColor Gray
+            Write-Host "  Details: $($check.Details)" -ForegroundColor Yellow
         }
     }
     
