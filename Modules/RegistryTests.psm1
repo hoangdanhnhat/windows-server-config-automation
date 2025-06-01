@@ -28,11 +28,55 @@ function Test-DisallowExploitProtectionOverride {
                     $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
                 }
             } else {
-                $check.Status = "FAIL"
+                $check.Status = "ERROR"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "FAIL"
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-RestrictRemoteSAM {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.10.11",
+        "RestrictRemoteSAM",
+        "Ensure 'DisallowExploitProtectionOverride' is set to 'O:BAG:BAD:(A;;RC;;;BA)'",
+        5,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa"
+        $regName = "RestrictRemoteSAM"
+        $expectedValue = "O:BAG:BAD:(A;;RC;;;BA)"
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $expectedValue"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
