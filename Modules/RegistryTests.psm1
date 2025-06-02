@@ -175,4 +175,262 @@ function Test-ConsentPromptBehaviorAdmin {
     $Results.AddCheck($check)
 }
 
+function Test-ConsentPromptBehaviorUser {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.17.3",
+        "ConsentPromptBehaviorUser",
+        "Ensure 'ConsentPromptBehaviorUser' is set 0",
+        9,
+        "Registry Test"
+    )
+      try {
+        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "ConsentPromptBehaviorUser"
+        $expectedValue = 0
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $($value.$regName)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected 0"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-EnableInstallerDetection {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.17.4",
+        "EnableInstallerDetection",
+        "Ensure 'EnableInstallerDetection' is set 1",
+        9,
+        "Registry Test"
+    )
+      try {
+        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "EnableInstallerDetection"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $($value.$regName)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-EnableSecureUIAPaths {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.17.5",
+        "EnableSecureUIAPaths",
+        "Ensure 'EnableSecureUIAPaths' is set 1",
+        9,
+        "Registry Test"
+    )
+      try {
+        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "EnableSecureUIAPaths"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $($value.$regName)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-EnableLUA {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.17.6",
+        "EnableLUA",
+        "Ensure 'EnableLUA' is set 1",
+        9,
+        "Registry Test"
+    )
+      try {
+        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "EnableLUA"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $($value.$regName)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-PromptOnSecureDesktop {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.17.7",
+        "PromptOnSecureDesktop",
+        "Ensure 'PromptOnSecureDesktop' is set 1",
+        9,
+        "Registry Test"
+    )
+      try {
+        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "PromptOnSecureDesktop"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $($value.$regName)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-PromptOnSecureDesktop {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.17.7",
+        "PromptOnSecureDesktop",
+        "Ensure 'PromptOnSecureDesktop' is set 1",
+        9,
+        "Registry Test"
+    )
+      try {
+        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "PromptOnSecureDesktop"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $($value.$regName)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
 Export-ModuleMember -Function Test-*
