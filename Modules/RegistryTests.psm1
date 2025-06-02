@@ -390,19 +390,20 @@ function Test-PromptOnSecureDesktop {
     $Results.AddCheck($check)
 }
 
-function Test-PromptOnSecureDesktop {
+function Test-EnableVirtualization {
     param([AuditResults]$Results)
     
     $check = [ConfigCheck]::new(
-        "2.3.17.7",
-        "PromptOnSecureDesktop",
-        "Ensure 'PromptOnSecureDesktop' is set 1",
+        "2.3.17.8",
+        "EnableVirtualization",
+        "Ensure 'EnableVirtualization' is set to '1'",
         9,
         "Registry Test"
     )
-      try {
+    
+    try {
         $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
-        $regName = "PromptOnSecureDesktop"
+        $regName = "EnableVirtualization"
         $expectedValue = 1
         
         if (Test-Path $regPath) {
@@ -415,6 +416,314 @@ function Test-PromptOnSecureDesktop {
                 } else {
                     $check.Status = "FAIL"
                     $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-RestrictDriverInstallationToAdministrators {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.7.10",
+        "RestrictDriverInstallationToAdministrators",
+        "Ensure 'RestrictDriverInstallationToAdministrators' is set to '1'",
+        8,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint"
+        $regName = "RestrictDriverInstallationToAdministrators"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $expectedValue"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-fAllowUnsolicited {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.9.35.1",
+        "fAllowUnsolicited",
+        "Ensure 'fAllowUnsolicited' is set to '0'",
+        5,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\Software\policies\Microsoft\Windows NT\Terminal Services"
+        $regName = "fAllowUnsolicited"
+        $expectedValue = 0
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $($value.$regName)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-fAllowToGetHelp {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.9.35.2",
+        "fAllowToGetHelp",
+        "Ensure 'fAllowToGetHelp' is set to '0'",
+        5,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\Software\policies\Microsoft\Windows NT\Terminal Services"
+        $regName = "fAllowToGetHelp"
+        $expectedValue = 0
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $($value.$regName)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-EnumerateAdministrators {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.10.14.2",
+        "EnumerateAdministrators",
+        "Ensure 'EnumerateAdministrators' is set to '0'",
+        5,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\CredUI"
+        $regName = "EnumerateAdministrators"
+        $expectedValue = 0
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $($value.$regName)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-DisableOneSettingsDownloads {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.10.15.3",
+        "DisableOneSettingsDownloads",
+        "Ensure 'DisableOneSettingsDownloads' is set to '1'",
+        5,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection"
+        $regName = "DisableOneSettingsDownloads"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $expectedValue"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-DoNotShowFeedbackNotifications {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.10.15.4",
+        "DoNotShowFeedbackNotifications",
+        "Ensure 'DoNotShowFeedbackNotifications' is set to '1'",
+        5,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection"
+        $regName = "DoNotShowFeedbackNotifications"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $expectedValue"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
+                }
+            } else {
+                $check.Status = "ERROR"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "ERROR"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-NoInplaceSharing {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "19.7.26.1",
+        "NoInplaceSharing",
+        "Ensure 'NoInplaceSharing' is set to '1'",
+        5,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "Registry::HKEY_USERS\*\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
+        $regName = "NoInplaceSharing"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $expectedValue"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
                 }
             } else {
                 $check.Status = "ERROR"
