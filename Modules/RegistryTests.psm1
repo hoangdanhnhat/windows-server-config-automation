@@ -28,11 +28,11 @@ function Test-DisallowExploitProtectionOverride {
                     $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -72,11 +72,11 @@ function Test-RestrictRemoteSAM {
                     $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -116,11 +116,11 @@ function Test-FilterAdministratorToken {
                     $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -159,11 +159,11 @@ function Test-ConsentPromptBehaviorAdmin {
                     $check.Details = "$regName is set to $($value.$regName), expected 1 or 2"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -202,11 +202,11 @@ function Test-ConsentPromptBehaviorUser {
                     $check.Details = "$regName is set to $($value.$regName), expected 0"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -245,11 +245,11 @@ function Test-EnableInstallerDetection {
                     $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -288,11 +288,11 @@ function Test-EnableSecureUIAPaths {
                     $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -331,11 +331,11 @@ function Test-EnableLUA {
                     $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -374,11 +374,11 @@ function Test-PromptOnSecureDesktop {
                     $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -418,11 +418,11 @@ function Test-EnableVirtualization {
                     $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -462,11 +462,11 @@ function Test-RestrictDriverInstallationToAdministrators {
                     $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -506,11 +506,11 @@ function Test-fAllowUnsolicited {
                     $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -550,11 +550,11 @@ function Test-fAllowToGetHelp {
                     $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -594,11 +594,11 @@ function Test-EnumerateAdministrators {
                     $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -638,11 +638,11 @@ function Test-DisableOneSettingsDownloads {
                     $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -682,11 +682,11 @@ function Test-DoNotShowFeedbackNotifications {
                     $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
@@ -726,11 +726,11 @@ function Test-NoInplaceSharing {
                     $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
                 }
             } else {
-                $check.Status = "ERROR"
+                $check.Status = "FAIL"
                 $check.Details = "$regName does not exist"
             }
         } else {
-            $check.Status = "ERROR"
+            $check.Status = "FAIL"
             $check.Details = "Registry path does not exist: $regPath"
         }
     }
