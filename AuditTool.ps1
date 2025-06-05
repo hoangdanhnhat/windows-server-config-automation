@@ -122,6 +122,14 @@ function Start-Audit {
         & $function.Name -Results $results
     }
 
+    Write-Host "Running User SID checks..." -ForegroundColor Cyan
+
+    # Get all exported functions from SIDTests module
+    $registryFunctions = Get-Command -Module SIDTests | Where-Object { $_.Name -like 'Test-*' }
+    foreach ($function in $registryFunctions) {
+        & $function.Name -Results $results
+    }
+
     Show-Report -Results $results
     
     if ($ExportCSV) {
