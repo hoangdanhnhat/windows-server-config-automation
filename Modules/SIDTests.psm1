@@ -49,14 +49,30 @@ function Test-AdminAccountRenamed {
     )
     
     try {
-        # Get Administrator account information using SID
-        $adminSID = "S-1-5-21-*-500"
-        $adminAccount = Get-WmiObject -Class Win32_UserAccount -Filter "SID like '$adminSID'"
+        # Check if running on a Domain Controller
+        $isDC = (Get-WmiObject -Class Win32_ComputerSystem).DomainRole -ge 4
         
+        if ($isDC) {
+            # Domain Controller - use AD cmdlets
+            if (!(Get-Module -Name ActiveDirectory)) {
+                Import-Module ActiveDirectory -ErrorAction Stop
+            }
+            $adminAccount = Get-ADUser -Filter * -Properties SID | Where-Object { $_.SID.Value.EndsWith("-500") }
+        } else {
+            # Member server or workstation - use local user cmdlets
+            $adminAccount = Get-LocalUser | Where-Object { $_.SID -like "*-500" } | Select-Object -First 1
+        }
+
         if ($adminAccount) {
-            if ($adminAccount.Name -ne "Administrator") {
+            if ($isDC) {
+                $accountName = $adminAccount.SamAccountName
+            } else {
+                $accountName = $adminAccount.Name
+            }
+
+            if ($accountName -ne "Administrator") {
                 $check.Status = "PASS"
-                $check.Details = "Administrator account has been renamed"
+                $check.Details = "Administrator account has been renamed to: $accountName"
             } else {
                 $check.Status = "FAIL"
                 $check.Details = "Administrator account is using default name and should be renamed"
@@ -86,14 +102,30 @@ function Test-GuestAccountRenamed {
     )
     
     try {
-        # Get Guest account information using SID
-        $guestSID = "S-1-5-21-*-501"
-        $guestAccount = Get-WmiObject -Class Win32_UserAccount -Filter "SID like '$guestSID'"
+        # Check if running on a Domain Controller
+        $isDC = (Get-WmiObject -Class Win32_ComputerSystem).DomainRole -ge 4
         
+        if ($isDC) {
+            # Domain Controller - use AD cmdlets
+            if (!(Get-Module -Name ActiveDirectory)) {
+                Import-Module ActiveDirectory -ErrorAction Stop
+            }
+            $guestAccount = Get-ADUser -Filter * -Properties SID | Where-Object { $_.SID.Value.EndsWith("-501") }
+        } else {
+            # Member server or workstation - use local user cmdlets
+            $guestAccount = Get-LocalUser | Where-Object { $_.SID -like "*-501" } | Select-Object -First 1
+        }
+
         if ($guestAccount) {
-            if ($guestAccount.Name -ne "Guest") {
+            if ($isDC) {
+                $accountName = $guestAccount.SamAccountName
+            } else {
+                $accountName = $guestAccount.Name
+            }
+
+            if ($accountName -ne "Guest") {
                 $check.Status = "PASS"
-                $check.Details = "Guest account has been renamed"
+                $check.Details = "Guest account has been renamed to: $accountName"
             } else {
                 $check.Status = "FAIL"
                 $check.Details = "Guest account is using default name and should be renamed"
