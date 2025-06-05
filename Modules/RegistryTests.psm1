@@ -570,10 +570,10 @@ function Test-EnumerateAdministrators {
     param([AuditResults]$Results)
     
     $check = [ConfigCheck]::new(
-        "18.10.14.2",
+        "18.10.15.2",
         "EnumerateAdministrators",
         "Ensure 'EnumerateAdministrators' is set to '0'",
-        5,
+        6,
         "Registry Test"
     )
     
@@ -614,7 +614,7 @@ function Test-DisableOneSettingsDownloads {
     param([AuditResults]$Results)
     
     $check = [ConfigCheck]::new(
-        "18.10.15.3",
+        "18.10.16.3",
         "DisableOneSettingsDownloads",
         "Ensure 'DisableOneSettingsDownloads' is set to '1'",
         5,
@@ -658,7 +658,7 @@ function Test-DoNotShowFeedbackNotifications {
     param([AuditResults]$Results)
     
     $check = [ConfigCheck]::new(
-        "18.10.15.4",
+        "18.10.16.4",
         "DoNotShowFeedbackNotifications",
         "Ensure 'DoNotShowFeedbackNotifications' is set to '1'",
         5,
