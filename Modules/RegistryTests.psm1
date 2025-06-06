@@ -792,7 +792,7 @@ function Test-InactivityTimeoutSecs {
     $check = [ConfigCheck]::new(
         "2.3.7.3",
         "InactivityTimeoutSecs",
-        "Ensure 'InactivityTimeoutSecs' is greater than 0",
+        "Ensure 'InactivityTimeoutSecs' is greater than 0 and less than 900",
         6,
         "Registry Test"
     )
@@ -805,9 +805,9 @@ function Test-InactivityTimeoutSecs {
             $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
             
             if ($null -ne $value) {
-                if ($value.$regName -gt 0) {
+                if ($value.$regName -gt 0 and $value.$regName -lt 900) {
                     $check.Status = "PASS"
-                    $check.Details = "$regName value is greater than 0"
+                    $check.Details = "$regName value is greater than 0 and smaller than 900"
                 } else {
                     $check.Status = "FAIL"
                     $check.Details = "$regName is set to $($value.$regName)"
@@ -835,14 +835,14 @@ function Test-AutoDisconnect {
     $check = [ConfigCheck]::new(
         "2.3.9.1",
         "AutoDisconnect",
-        "Ensure 'AutoDisconnect' is greater than 0",
+        "Ensure 'AutoDisconnect' value is less than 15 minutes",
         6,
         "Registry Test"
     )
     
     try {
         $regPath = "HKLM:\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters"
-        $regName = "InactivityTimeoutSecs"
+        $regName = "AutoDisconnect"
         $expectedValue = 15
         
         if (Test-Path $regPath) {
@@ -893,7 +893,271 @@ function Test-enableforcedlogoff {
             $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
             
             if ($null -ne $value) {
-                if ($value.$regName -lt $expectedValue) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-LimitBlankPasswordUse {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.1.2",
+        "LimitBlankPasswordUse",
+        "Ensure 'LimitBlankPasswordUse' is set to '1'",
+        8,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa"
+        $regName = "LimitBlankPasswordUse"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-DontDisplayLastUserName {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.7.2",
+        "DontDisplayLastUserName",
+        "Ensure 'DontDisplayLastUserName' is set to '1'",
+        7,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "DontDisplayLastUserName"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-DisableCAD {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.7.1",
+        "DisableCAD",
+        "Ensure 'DisableCAD' is set to '0'",
+        5,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "DisableCAD"
+        $expectedValue = 0
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-LegalNoticeText {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.7.4",
+        "LegalNoticeText",
+        "Ensure 'LegalNoticeText' is set",
+        2,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "LegalNoticeText"
+        $notEexpectedValue = ''
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -ne $notExpectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value is set to $($value.$regName)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is not set"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-LegalNoticeCaption {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.7.5",
+        "LegalNoticeCaption",
+        "Ensure 'LegalNoticeCaption' is set",
+        2,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "LegalNoticeCaption"
+        $notExpectedValue = ''
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -ne $notExpectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value is set to $($value.$regName)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is not set"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-UserAuthentication {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.10.57.3.9.4",
+        "UserAuthentication",
+        "Ensure 'UserAuthentication' is set to '1'",
+        6,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services"
+        $regName = "UserAuthentication"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
                     $check.Status = "PASS"
                     $check.Details = "$regName value set to $($expectedValue)"
                 } else {
