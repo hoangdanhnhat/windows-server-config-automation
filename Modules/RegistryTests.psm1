@@ -100,7 +100,7 @@ function Test-FilterAdministratorToken {
     )
     
     try {
-        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "FilterAdministratorToken"
         $expectedValue = 1
         
@@ -143,7 +143,7 @@ function Test-ConsentPromptBehaviorAdmin {
         "Registry Test"
     )
       try {
-        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "ConsentPromptBehaviorAdmin"
         #expected value is [1,2]
         
@@ -186,7 +186,7 @@ function Test-ConsentPromptBehaviorUser {
         "Registry Test"
     )
       try {
-        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "ConsentPromptBehaviorUser"
         $expectedValue = 0
         
@@ -229,7 +229,7 @@ function Test-EnableInstallerDetection {
         "Registry Test"
     )
       try {
-        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "EnableInstallerDetection"
         $expectedValue = 1
         
@@ -272,7 +272,7 @@ function Test-EnableSecureUIAPaths {
         "Registry Test"
     )
       try {
-        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "EnableSecureUIAPaths"
         $expectedValue = 1
         
@@ -315,7 +315,7 @@ function Test-EnableLUA {
         "Registry Test"
     )
       try {
-        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "EnableLUA"
         $expectedValue = 1
         
@@ -358,7 +358,7 @@ function Test-PromptOnSecureDesktop {
         "Registry Test"
     )
       try {
-        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "PromptOnSecureDesktop"
         $expectedValue = 1
         
@@ -402,7 +402,7 @@ function Test-EnableVirtualization {
     )
     
     try {
-        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "EnableVirtualization"
         $expectedValue = 1
         
@@ -446,7 +446,7 @@ function Test-RestrictDriverInstallationToAdministrators {
     )
     
     try {
-        $regPath = "HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint"
+        $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint"
         $regName = "RestrictDriverInstallationToAdministrators"
         $expectedValue = 1
         
@@ -490,7 +490,7 @@ function Test-fAllowUnsolicited {
     )
     
     try {
-        $regPath = "HKLM:\Software\policies\Microsoft\Windows NT\Terminal Services"
+        $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services"
         $regName = "fAllowUnsolicited"
         $expectedValue = 0
         
@@ -534,7 +534,7 @@ function Test-fAllowToGetHelp {
     )
     
     try {
-        $regPath = "HKLM:\Software\policies\Microsoft\Windows NT\Terminal Services"
+        $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services"
         $regName = "fAllowToGetHelp"
         $expectedValue = 0
         
@@ -578,7 +578,7 @@ function Test-EnumerateAdministrators {
     )
     
     try {
-        $regPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\CredUI"
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\CredUI"
         $regName = "EnumerateAdministrators"
         $expectedValue = 0
         
@@ -710,7 +710,7 @@ function Test-NoInplaceSharing {
     )
     
     try {
-        $regPath = "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
+        $regPath = "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer"
         $regName = "NoInplaceSharing"
         $expectedValue = 1
         
@@ -754,7 +754,7 @@ function Test-LocalAccountFilterPolicy {
     )
     
     try {
-        $regPath = "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regPath = "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "LocalAccountTokenFilterPolicy"
         $expectedValue = 0
         
@@ -798,7 +798,7 @@ function Test-InactivityTimeoutSecs {
     )
     
     try {
-        $regPath = "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regPath = "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "InactivityTimeoutSecs"
         
         if (Test-Path $regPath) {
