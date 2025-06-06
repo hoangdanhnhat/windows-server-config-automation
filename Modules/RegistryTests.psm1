@@ -710,7 +710,7 @@ function Test-NoInplaceSharing {
     )
     
     try {
-        $regPath = "Registry::HKEY_USERS\*\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
+        $regPath = "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer"
         $regName = "NoInplaceSharing"
         $expectedValue = 1
         
@@ -754,7 +754,7 @@ function Test-LocalAccountFilterPolicy {
     )
     
     try {
-        $regPath = "Registry::HKEY_USERS\*\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regPath = "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "LocalAccountTokenFilterPolicy"
         $expectedValue = 0
         
@@ -798,7 +798,7 @@ function Test-InactivityTimeoutSecs {
     )
     
     try {
-        $regPath = "Registry::HKEY_USERS\*\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regPath = "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "InactivityTimeoutSecs"
         
         if (Test-Path $regPath) {
@@ -841,7 +841,7 @@ function Test-AutoDisconnect {
     )
     
     try {
-        $regPath = "Registry::HKEY_USERS\*\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters"
+        $regPath = "HKLM\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters"
         $regName = "InactivityTimeoutSecs"
         $expectedValue = 15
         
@@ -885,7 +885,7 @@ function Test-enableforcedlogoff {
     )
     
     try {
-        $regPath = "Registry::HKEY_USERS\*\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters"
+        $regPath = "HKLM\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters"
         $regName = "enableforcedlogoff"
         $expectedValue = 1
         
