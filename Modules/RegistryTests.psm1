@@ -805,7 +805,7 @@ function Test-InactivityTimeoutSecs {
             $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
             
             if ($null -ne $value) {
-                if ($value.$regName -gt 0 and $value.$regName -lt 900) {
+                if ($value.$regName -gt 0 -and $value.$regName -lt 900) {
                     $check.Status = "PASS"
                     $check.Details = "$regName value is greater than 0 and smaller than 900"
                 } else {
