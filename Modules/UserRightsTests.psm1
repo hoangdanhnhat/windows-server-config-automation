@@ -1845,7 +1845,7 @@ function Test-SeNetworkLogonRight {
     param([AuditResults]$Results)
     
     $check = [ConfigCheck]::new(
-        "2.2.38",
+        "2.2.3",
         "SeNetworkLogonRight",
         "Access this computer from the network should be restricted",
         5,
