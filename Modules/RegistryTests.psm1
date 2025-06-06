@@ -742,4 +742,179 @@ function Test-NoInplaceSharing {
     $Results.AddCheck($check)
 }
 
+function Test-LocalAccountFilterPolicy {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.4.1",
+        "LocalAccountTokenFilterPolicy",
+        "Ensure 'LocalAccountTokenFilterPolicy' is set to '0'",
+        7,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "Registry::HKEY_USERS\*\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "LocalAccountTokenFilterPolicy"
+        $expectedValue = 0
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName is set to $expectedValue"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $expectedValue"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-InactivityTimeoutSecs {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.7.3",
+        "InactivityTimeoutSecs",
+        "Ensure 'InactivityTimeoutSecs' is greater than 0",
+        6,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "Registry::HKEY_USERS\*\Software\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "InactivityTimeoutSecs"
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -gt 0) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value is greater than 0"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-AutoDisconnect {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.9.1",
+        "AutoDisconnect",
+        "Ensure 'AutoDisconnect' is greater than 0",
+        6,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "Registry::HKEY_USERS\*\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters"
+        $regName = "InactivityTimeoutSecs"
+        $expectedValue = 15
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -lt $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value is less than $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected less than $($expectedValue)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-enableforcedlogoff {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.9.4",
+        "enableforcedlogoff",
+        "Ensure 'enableforcedlogoff' is set to 1",
+        6,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "Registry::HKEY_USERS\*\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters"
+        $regName = "enableforcedlogoff"
+        $expectedValue = 1
+        
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -lt $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
 Export-ModuleMember -Function Test-*
