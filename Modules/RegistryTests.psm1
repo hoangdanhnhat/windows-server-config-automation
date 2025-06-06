@@ -4,10 +4,10 @@ function Test-DisallowExploitProtectionOverride {
     param([AuditResults]$Results)
     
     $check = [ConfigCheck]::new(
-        "18.10.91.2.1",
+        "18.10.92.2.1",
         "DisallowExploitProtectionOverride",
         "Ensure 'DisallowExploitProtectionOverride' is set to '1'",
-        5,
+        9,
         "Registry Test"
     )
     
