@@ -77,7 +77,8 @@ function Start-Audit {
         }
     }
     
-    # Display summary
+    # Update and display summary
+    $results.UpdateStats()
     Write-Host "`nAudit Summary:" -ForegroundColor Cyan
     Write-Host "=============" -ForegroundColor Cyan
     Write-Host "Total Criteria Checked: $($results.Total)" -ForegroundColor White
