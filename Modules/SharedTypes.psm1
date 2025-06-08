@@ -29,6 +29,10 @@ class AuditResults {
     AuditResults() {
         $this.Checks = New-Object System.Collections.ArrayList
         $this.StartTime = Get-Date
+        $this.Total = 0
+        $this.Passed = 0
+        $this.Failed = 0
+        $this.Errors = 0
     }
     
     [void]AddCheck([ConfigCheck]$check) {
