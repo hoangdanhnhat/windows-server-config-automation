@@ -1533,4 +1533,47 @@ function Test-ForceGuest {
     $Results.AddCheck($check)
 }
 
+function Test-PasswordExpiryWarning  {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.7.7",
+        "PasswordExpiryWarning ",
+        "Ensure 'PasswordExpiryWarning ' is set from 5 days to 14 days",
+        5,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+        $regName = "PasswordExpiryWarning"
+
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -ge 5 -and $value.$regName -le 14) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($value.$regName)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected from 5 to 14 days"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
 Export-ModuleMember -Function Test-*
