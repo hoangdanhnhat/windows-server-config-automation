@@ -67,9 +67,6 @@ function Start-Audit {
         & $function.Name -Results $results
     }
 
-    # Uncomment the line below to show the audit result on the terminal
-    # Show-Report -Results $results
-    
     if ($ExportCSV) {
         if ($CSVPath) {
             # If custom path provided, ensure it's in the Reports folder
@@ -80,6 +77,16 @@ function Start-Audit {
         }
     }
     
+    # Display summary
+    Write-Host "`nAudit Summary:" -ForegroundColor Cyan
+    Write-Host "=============" -ForegroundColor Cyan
+    Write-Host "Total Criteria Checked: $($results.Total)" -ForegroundColor White
+    Write-Host "Passed              : $($results.Passed)" -ForegroundColor Green
+    Write-Host "Failed              : $($results.Failed)" -ForegroundColor Red
+    $passRate = if ($results.Total -gt 0) { [math]::Round(($results.Passed / $results.Total) * 100, 2) } else { 0 }
+    Write-Host "Pass Rate           : ${passRate}%" -ForegroundColor $(if ($passRate -ge 80) { "Green" } elseif ($passRate -ge 60) { "Yellow" } else { "Red" })
+    Write-Host ""
+    
     return $results
 }
 
@@ -87,4 +94,4 @@ Write-Host "Windows Server Configuration Audit Tool Loaded" -ForegroundColor Gre
 Write-Host "Usage: Start-Audit or Start-Audit -ExportCSV" -ForegroundColor Yellow
 Write-Host ""
 
-Start-Audit -ExportCSV
+Start-Audit -ExportCSV | Out-Null
