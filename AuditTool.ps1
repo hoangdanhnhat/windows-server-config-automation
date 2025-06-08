@@ -106,11 +106,19 @@ function Start-Audit {
     
     $results = [AuditResults]::new()
     
-    Write-Host "Running security privilege checks..." -ForegroundColor Cyan
+    Write-Host "Running User Rights Assignment checks..." -ForegroundColor Cyan
 
     # Get all exported functions from UserRightsTests module
     $userRightsFunctions = Get-Command -Module UserRightsTests | Where-Object { $_.Name -like 'Test-*' }
     foreach ($function in $userRightsFunctions) {
+        & $function.Name -Results $results
+    }
+
+    Write-Host "Running password policy checks..." -ForegroundColor Cyan
+
+    # Get all exported functions from PasswordPolicyTests module
+    $passwordPolicyFunctions = Get-Command -Module PasswordPolicyTests | Where-Object { $_.Name -like 'Test-*' }
+    foreach ($function in $passwordPolicyFunctions) {
         & $function.Name -Results $results
     }
     
@@ -130,7 +138,7 @@ function Start-Audit {
         & $function.Name -Results $results
     }
 
-    # Uncomment to show the audit result on the terminal
+    # Uncomment the line below to show the audit result on the terminal
     # Show-Report -Results $results
     
     if ($ExportCSV) {
