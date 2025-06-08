@@ -1063,7 +1063,7 @@ function Test-LegalNoticeText {
     try {
         $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
         $regName = "LegalNoticeText"
-        $notEexpectedValue = ''
+        $notExpectedValue = ''
         
         if (Test-Path $regPath) {
             $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
@@ -1153,6 +1153,358 @@ function Test-UserAuthentication {
         $regName = "UserAuthentication"
         $expectedValue = 1
         
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-SMBServerNameHardeningLevel {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.9.5",
+        "SMBServerNameHardeningLevel",
+        "Ensure 'SMBServerNameHardeningLevel' is set to '1' or '2'",
+        8,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters"
+        $regName = "SMBServerNameHardeningLevel"
+        $expectedValue = (1, 2)
+
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -in $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue -join ", ")"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-ShutdownWithoutLogon {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.13.1",
+        "ShutdownWithoutLogon",
+        "Ensure 'ShutdownWithoutLogon' is set to '0'",
+        6,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+        $regName = "ShutdownWithoutLogon"
+        $expectedValue = 0
+
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-AutoAdminLogon {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.5.1",
+        "AutoAdminLogon",
+        "Ensure 'AutoAdminLogon' is set to '0'",
+        6,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+        $regName = "AutoAdminLogon"
+        $expectedValue = 0
+
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-DCSettingIndex {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.9.33.6.3",
+        "DCSettingIndex",
+        "Ensure 'DCSettingIndex' is set to '1'",
+        6,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Power\PowerSettings\0e796bdb-100d-47d6-a2d5f7d2daa51f51"
+        $regName = "DCSettingIndex"
+        $expectedValue = 0
+
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-ACSettingIndex {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.9.33.6.4",
+        "ACSettingIndex",
+        "Ensure 'ACSettingIndex' is set to '1'",
+        6,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Power\PowerSettings\0e796bdb-100d-47d6-a2d5f7d2daa51f51"
+        $regName = "ACSettingIndex"
+        $expectedValue = 0
+
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-EnableAuthEpResolution {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.9.36.1",
+        "EnableAuthEpResolution",
+        "Ensure 'EnableAuthEpResolution' is set to '1'",
+        6,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Rpc"
+        $regName = "EnableAuthEpResolution"
+        $expectedValue = 0
+
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -eq $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue)"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-RequirePinForPairing {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "18.10.14.1",
+        "RequirePinForPairing",
+        "Ensure 'RequirePinForPairing' is set to '1'",
+        3,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Connect"
+        $regName = "RequirePinForPairing"
+        $expectedValue = (1,2)
+
+        if (Test-Path $regPath) {
+            $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
+            
+            if ($null -ne $value) {
+                if ($value.$regName -in $expectedValue) {
+                    $check.Status = "PASS"
+                    $check.Details = "$regName value set to $($expectedValue)"
+                } else {
+                    $check.Status = "FAIL"
+                    $check.Details = "$regName is set to $($value.$regName), expected $($expectedValue -join ", ")"
+                }
+            } else {
+                $check.Status = "FAIL"
+                $check.Details = "$regName does not exist"
+            }
+        } else {
+            $check.Status = "FAIL"
+            $check.Details = "Registry path does not exist: $regPath"
+        }
+    }
+    catch {
+        $check.Status = "ERROR"
+        $check.Details = "Error checking registry: $($_.Exception.Message)"
+    }
+    
+    $Results.AddCheck($check)
+}
+
+function Test-ForceGuest {
+    param([AuditResults]$Results)
+    
+    $check = [ConfigCheck]::new(
+        "2.3.10.13",
+        "ForceGuest",
+        "Ensure 'ForceGuest' is set to '0'",
+        5,
+        "Registry Test"
+    )
+    
+    try {
+        $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa"
+        $regName = "ForceGuest"
+        $expectedValue = 0
+
         if (Test-Path $regPath) {
             $value = Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
             
