@@ -130,7 +130,8 @@ function Start-Audit {
         & $function.Name -Results $results
     }
 
-    Show-Report -Results $results
+    # Uncomment to show the audit result on the terminal
+    # Show-Report -Results $results
     
     if ($ExportCSV) {
         if ($CSVPath) {
