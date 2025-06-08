@@ -9,6 +9,7 @@ Import-Module (Join-Path $ModulePath "UserRightsTests.psm1") -Force
 Import-Module (Join-Path $ModulePath "RegistryTests.psm1") -Force
 Import-Module (Join-Path $ModulePath "SIDTests.psm1") -Force
 Import-Module (Join-Path $ModulePath "PasswordPolicyTests.psm1") -Force
+Import-Module (Join-Path $ModulePath "LockoutPolicyTests.psm1") -Force
 
 function Export-ToCSV {
     param(
@@ -62,8 +63,16 @@ function Start-Audit {
     Write-Host "Running User SID checks..." -ForegroundColor Cyan
 
     # Get all exported functions from SIDTests module
-    $registryFunctions = Get-Command -Module SIDTests | Where-Object { $_.Name -like 'Test-*' }
-    foreach ($function in $registryFunctions) {
+    $SIDFunction = Get-Command -Module SIDTests | Where-Object { $_.Name -like 'Test-*' }
+    foreach ($function in $SIDFunction) {
+        & $function.Name -Results $results
+    }
+
+    Write-Host "Running Lockout Policy checks..." -ForegroundColor Cyan
+
+    # Get all exported functions from LockoutPolicyTests module
+    $lockoutPolicyFunctions = Get-Command -Module LockoutPolicyTests | Where-Object { $_.Name -like 'Test-*' }
+    foreach ($function in $lockoutPolicyFunctions) {
         & $function.Name -Results $results
     }
 
