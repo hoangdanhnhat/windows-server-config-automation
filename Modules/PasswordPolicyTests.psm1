@@ -96,7 +96,7 @@ function Test-PasswordHistorySize {
     $check = [ConfigCheck]::new(
         "1.1.1",
         "PasswordHistorySize",
-        "Ensure 'PasswordHistorySize' is set to 15 minutes or more",
+        "Ensure 'PasswordHistorySize' is set to 24 or more",
         7,
         "Password Policy"
     )
@@ -153,7 +153,7 @@ function Test-ClearTextPassword {
         
         if ($line) {
             $value = [int]($line -split "=")[1].Trim()
-            if ($value -ge 24) {
+            if ($value -eq 0) {
                 $check.Status = "PASS"
                 $check.Details = "ClearTextPassword is set to $value"
             } else {
@@ -184,7 +184,7 @@ function Test-MaximumPasswordAge {
     $check = [ConfigCheck]::new(
         "1.1.2",
         "MaximumPasswordAge",
-        "Ensure 'MaximumPasswordAge' is set to from 1 to 365 days'",
+        "Ensure 'MaximumPasswordAge' is set to 90 days or fewer'",
         7,
         "Password Policy"
     )
