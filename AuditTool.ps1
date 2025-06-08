@@ -8,6 +8,7 @@ Import-Module (Join-Path $ModulePath "SharedTypes.psm1") -Force -DisableNameChec
 Import-Module (Join-Path $ModulePath "UserRightsTests.psm1") -Force
 Import-Module (Join-Path $ModulePath "RegistryTests.psm1") -Force
 Import-Module (Join-Path $ModulePath "SIDTests.psm1") -Force
+Import-Moduel (Join-Path $ModulePath "PasswordPolicyTests.psm1") -Force
 
 # Report Generation
 function Show-Report {
