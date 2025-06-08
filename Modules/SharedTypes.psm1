@@ -18,11 +18,12 @@ class ConfigCheck {
     }
 }
 
-class AuditResults {
+class AuditResults {    
     [System.Collections.ArrayList]$Checks
     [int]$Total
     [int]$Passed
     [int]$Failed
+    [int]$Errors
     [datetime]$StartTime
     
     AuditResults() {
@@ -38,6 +39,7 @@ class AuditResults {
         $this.Total = $this.Checks.Count
         $this.Passed = ($this.Checks | Where-Object { $_.Status -eq "PASS" }).Count
         $this.Failed = ($this.Checks | Where-Object { $_.Status -eq "FAIL" }).Count
+        $this.Errors = ($this.Checks | Where-Object { $_.Status -eq "ERROR" }).Count
     }
 }
 
