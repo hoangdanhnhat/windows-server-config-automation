@@ -102,7 +102,7 @@ function Start-Audit {
 }
 
 Write-Host "Windows Server Configuration Audit Tool Loaded" -ForegroundColor Green
-Write-Host "Usage: Start-Audit or Start-Audit -ExportCSV" -ForegroundColor Yellow
+# Write-Host "Usage: Start-Audit or Start-Audit -ExportCSV" -ForegroundColor Yellow
 Write-Host ""
 
 Start-Audit -ExportCSV | Out-Null
