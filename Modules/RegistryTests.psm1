@@ -139,7 +139,7 @@ function Test-ConsentPromptBehaviorAdmin {
         "2.3.17.2",
         "ConsentPromptBehaviorAdmin",
         "Ensure 'ConsentPromptBehaviorAdmin' is set to 1 or 2",
-        9,
+        8,
         "Registry Test"
     )
       try {
@@ -441,7 +441,7 @@ function Test-RestrictDriverInstallationToAdministrators {
         "18.7.10",
         "RestrictDriverInstallationToAdministrators",
         "Ensure 'RestrictDriverInstallationToAdministrators' is set to '1'",
-        8,
+        10,
         "Registry Test"
     )
     
