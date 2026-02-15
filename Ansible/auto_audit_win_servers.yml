@@ -1,0 +1,46 @@
+---
+- name: Deploy and Run Auto Audit Script on Windows Servers
+  hosts: windows_servers
+  gather_facts: no
+  vars:
+    remote_temp_path: 'C:\temp_automation'
+    local_report_dir: './fetched_reports'
+
+  tasks:
+    - name: 1. Ensure remote temp directory exists
+      win_file:
+        path: "{{ remote_temp_path }}"
+        state: directory
+
+    - name: 2. Copy the script folder to Windows
+      win_copy:
+        src: ../PowerShellScript/
+        dest: "{{ remote_temp_path }}/"
+
+    - name: 3. Execute the main script
+      win_shell: |
+        cd "{{ remote_temp_path }}"
+        powershell.exe -ExecutionPolicy Bypass -File .\AuditTool.ps1
+      register: script_output
+
+    - name: 4. Find the generated report file
+      win_find:
+        paths: "{{ remote_temp_path }}/Reports"
+        patterns: "*.csv"
+      register: found_reports
+
+    - name: 5. Fetch the report back to Linux
+      fetch:
+        src: "{{ item.path }}"
+        dest: "{{ local_report_dir }}/"
+        flat: yes
+      loop: "{{ found_reports.files }}"
+
+    - name: 6. Cleanup - Delete everything from Windows
+      win_file:
+        path: "{{ remote_temp_path }}"
+        state: absent
+
+    - name: Final Summary
+      debug:
+        msg: "Workflow complete. Check {{ local_report_dir }} for your reports."
